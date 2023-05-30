@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`applies plugins 1`] = `
-"import _JSXStyle from 'styled-jsx/style';
+"import _JSXStyle from 'styled-jsx-container/style';
 import styles from './styles';
 const color = 'red';
 
@@ -28,7 +28,7 @@ export default (() => <div>
 `;
 
 exports[`passes options to plugins 1`] = `
-"import _JSXStyle from 'styled-jsx/style';
+"import _JSXStyle from 'styled-jsx-container/style';
 import styles from './styles';
 const color = 'red';
 

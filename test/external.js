@@ -40,9 +40,9 @@ test('(optimized) transpiles external stylesheets (CommonJS modules)', async t =
   t.snapshot(code)
 })
 
-test('does not transpile non-styled-jsx tagged teplate literals', async t => {
+test('does not transpile non-styled-jsx-container tagged teplate literals', async t => {
   const { code } = await transform(
-    './fixtures/not-styled-jsx-tagged-templates.js'
+    './fixtures/not-styled-jsx-container-tagged-templates.js'
   )
   t.snapshot(code)
 })
@@ -80,7 +80,7 @@ test('use external stylesheets (global only)', async t => {
 
 test('injects JSXStyle for nested scope', async t => {
   const { code } = await transformSource(`
-    import css from 'styled-jsx/css'
+    import css from 'styled-jsx-container/css'
 
     function test() {
       css.resolve\`div { color: red }\`
@@ -117,7 +117,7 @@ test('Makes sure that style nodes are not re-used', async t => {
 test('Make sure that it works with the new automatic transform', async t => {
   const { code } = await transformSource(
     `
-    import css from "styled-jsx/css";
+    import css from "styled-jsx-container/css";
 
     const A = css.resolve\`
       div {

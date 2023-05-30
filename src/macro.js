@@ -13,8 +13,8 @@ export default ({ createMacro, MacroError }) => {
 
     // Holds a reference to all the lines where strings are tagged using the `css` tag name.
     // We print a warning at the end of the macro in case there is any reference to css,
-    // because `css` is generally used as default import name for 'styled-jsx/css'.
-    // People who want to migrate from this macro to pure styled-jsx might have name conflicts issues.
+    // because `css` is generally used as default import name for 'styled-jsx-container/css'.
+    // People who want to migrate from this macro to pure styled-jsx-container might have name conflicts issues.
     const cssReferences = []
 
     // references looks like this
@@ -24,7 +24,7 @@ export default ({ createMacro, MacroError }) => {
     // }
     Object.keys(references).forEach(refName => {
       // Enforce `resolve` as named import so people
-      // can only import { resolve } from 'styled-jsx/macro'
+      // can only import { resolve } from 'styled-jsx-container/macro'
       // or an alias of it eg. { resolve as foo }
       if (refName !== 'default' && refName !== 'resolve') {
         throw new MacroError(
@@ -46,7 +46,7 @@ export default ({ createMacro, MacroError }) => {
           // grab .resolve
           const tagPropertyName = templateExpression.get('property').node.name
           // Member expressions are only valid on default imports
-          // eg. import css from 'styled-jsx/macro'
+          // eg. import css from 'styled-jsx-container/macro'
           if (refName !== 'default') {
             throw new MacroError(
               `Can't use named import ${
@@ -113,11 +113,11 @@ export default ({ createMacro, MacroError }) => {
 
     if (cssReferences.length > 0) {
       console.warn(
-        `styled-jsx - Warning - We detected that you named your tag as \`css\` at lines: ${cssReferences.join(
+        `styled-jsx-container - Warning - We detected that you named your tag as \`css\` at lines: ${cssReferences.join(
           ', '
         )}.\n` +
-          'This tag name is usually used as default import name for `styled-jsx/css`.\n' +
-          'Porting macro code to pure styled-jsx in the future might be a bit problematic.'
+          'This tag name is usually used as default import name for `styled-jsx-container/css`.\n' +
+          'Porting macro code to pure styled-jsx-container in the future might be a bit problematic.'
       )
     }
   }

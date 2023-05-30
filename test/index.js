@@ -132,8 +132,8 @@ test('should have different jsx ids', async t => {
   t.snapshot(code)
 })
 
-test('works with non styled-jsx styles', async t => {
-  const { code } = await transform('./fixtures/non-styled-jsx-style.js')
+test('works with non styled-jsx-container styles', async t => {
+  const { code } = await transform('./fixtures/non-styled-jsx-container-style.js')
   t.snapshot(code)
 })
 

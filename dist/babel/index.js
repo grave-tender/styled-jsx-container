@@ -22933,7 +22933,7 @@ function disableNestingPlugin() {
           ':' +
           column +
           '. ' +
-          'Unfortunately nesting is not supported by styled-jsx.'
+          'Unfortunately nesting is not supported by styled-jsx-container.'
       )
     }
   }
@@ -23264,7 +23264,7 @@ var getJSXStyleInfo = function (expr, scope) {
   // e.g.
   // p { color: ${myConstant}; }
   // becomes
-  // p { color: %%styled-jsx-placeholder-${id}%%; }
+  // p { color: %%styled-jsx-container-placeholder-${id}%%; }
   var quasis = node.quasis,
     expressions = node.expressions
   var hash = hashString(expr.getSource().slice(1, -1))
@@ -23287,7 +23287,7 @@ var getJSXStyleInfo = function (expr, scope) {
       quasi.value.raw +
       (quasis.length === index + 1
         ? ''
-        : '%%styled-jsx-placeholder-' + index + '%%')
+        : '%%styled-jsx-container-placeholder-' + index + '%%')
     )
   }, '')
   return {
@@ -23379,7 +23379,7 @@ var computeClassNames = function (
 var templateLiteralFromPreprocessedCss = function (css, expressions) {
   var quasis = []
   var finalExpressions = []
-  var parts = css.split(/(?:%%styled-jsx-placeholder-(\d+)%%)/g)
+  var parts = css.split(/(?:%%styled-jsx-container-placeholder-(\d+)%%)/g)
   if (parts.length === 1) {
     return lib$1.stringLiteral(css)
   }
@@ -23501,7 +23501,7 @@ var combinePlugins = function (plugins) {
         plugin = plugin[0]
         if (Object.prototype.hasOwnProperty.call(options, 'babel')) {
           throw new Error(
-            '\n            Error while trying to register the styled-jsx plugin: ' +
+            '\n            Error while trying to register the styled-jsx-container plugin: ' +
               plugin +
               '\n            The option name `babel` is reserved.\n          '
           )
@@ -23671,10 +23671,10 @@ var setStateOptions = function (state) {
   state.styleModule =
     typeof state.opts.styleModule === 'string'
       ? state.opts.styleModule
-      : 'styled-jsx/style'
+      : 'styled-jsx-container/style'
 }
 function log(message) {
-  console.log('[styled-jsx] ' + message)
+  console.log('[styled-jsx-container] ' + message)
 }
 
 function _extends$1() {
@@ -23802,12 +23802,12 @@ function addHash(exportIdentifier, hash) {
 }
 var visitor = {
   ImportDeclaration: function ImportDeclaration(path, state) {
-    // import css from 'styled-jsx/css'
-    if (path.node.source.value !== 'styled-jsx/css') {
+    // import css from 'styled-jsx-container/css'
+    if (path.node.source.value !== 'styled-jsx-container/css') {
       return
     }
     // Find all the imported specifiers.
-    // e.g import css, { global, resolve } from 'styled-jsx/css'
+    // e.g import css, { global, resolve } from 'styled-jsx-container/css'
     // -> ['css', 'global', 'resolve']
     var specifiersNames = path.node.specifiers.map(function (specifier) {
       return specifier.local.name
@@ -23888,7 +23888,7 @@ var visitor = {
       var hasCssResolve =
         hasJSXStyle && taggedTemplateExpressions.resolve.length > 0
       // When using the `resolve` helper we need to add an import
-      // for the _JSXStyle component `styled-jsx/style`
+      // for the _JSXStyle component `styled-jsx-container/style`
       if (hasCssResolve) {
         state.file.hasCssResolve = true
       }
@@ -23907,8 +23907,8 @@ function babelMacro(param) {
     setStateOptions(state)
     // Holds a reference to all the lines where strings are tagged using the `css` tag name.
     // We print a warning at the end of the macro in case there is any reference to css,
-    // because `css` is generally used as default import name for 'styled-jsx/css'.
-    // People who want to migrate from this macro to pure styled-jsx might have name conflicts issues.
+    // because `css` is generally used as default import name for 'styled-jsx-container/css'.
+    // People who want to migrate from this macro to pure styled-jsx-container might have name conflicts issues.
     var cssReferences = []
     // references looks like this
     // {
@@ -23917,7 +23917,7 @@ function babelMacro(param) {
     // }
     Object.keys(references).forEach(function (refName) {
       // Enforce `resolve` as named import so people
-      // can only import { resolve } from 'styled-jsx/macro'
+      // can only import { resolve } from 'styled-jsx-container/macro'
       // or an alias of it eg. { resolve as foo }
       if (refName !== 'default' && refName !== 'resolve') {
         throw new MacroError(
@@ -23939,7 +23939,7 @@ function babelMacro(param) {
           // grab .resolve
           var tagPropertyName = templateExpression.get('property').node.name
           // Member expressions are only valid on default imports
-          // eg. import css from 'styled-jsx/macro'
+          // eg. import css from 'styled-jsx-container/macro'
           if (refName !== 'default') {
             throw new MacroError(
               "Can't use named import " +
@@ -24010,11 +24010,11 @@ function babelMacro(param) {
     })
     if (cssReferences.length > 0) {
       console.warn(
-        'styled-jsx - Warning - We detected that you named your tag as `css` at lines: ' +
+        'styled-jsx-container - Warning - We detected that you named your tag as `css` at lines: ' +
           cssReferences.join(', ') +
           '.\n' +
-          'This tag name is usually used as default import name for `styled-jsx/css`.\n' +
-          'Porting macro code to pure styled-jsx in the future might be a bit problematic.'
+          'This tag name is usually used as default import name for `styled-jsx-container/css`.\n' +
+          'Porting macro code to pure styled-jsx-container in the future might be a bit problematic.'
       )
     }
   }
@@ -24317,7 +24317,7 @@ function babel(param) {
           throw path.buildCodeFrameError(
             'Detected nested style tag' +
               (styleTagSrc ? ': \n\n' + styleTagSrc + '\n\n' : ' ') +
-              'styled-jsx only allows style tags ' +
+              'styled-jsx-container only allows style tags ' +
               'to be direct descendants (children) of the outermost ' +
               'JSX element i.e. the subtree root.'
           )

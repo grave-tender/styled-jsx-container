@@ -220,7 +220,7 @@ export const getJSXStyleInfo = (expr, scope) => {
   // e.g.
   // p { color: ${myConstant}; }
   // becomes
-  // p { color: %%styled-jsx-placeholder-${id}%%; }
+  // p { color: %%styled-jsx-container-placeholder-${id}%%; }
 
   const { quasis, expressions } = node
   const hash = hashString(expr.getSource().slice(1, -1))
@@ -242,7 +242,7 @@ export const getJSXStyleInfo = (expr, scope) => {
   const css = quasis.reduce(
     (css, quasi, index) =>
       `${css}${quasi.value.raw}${
-        quasis.length === index + 1 ? '' : `%%styled-jsx-placeholder-${index}%%`
+        quasis.length === index + 1 ? '' : `%%styled-jsx-container-placeholder-${index}%%`
       }`,
     ''
   )
@@ -343,7 +343,7 @@ export const computeClassNames = (
 export const templateLiteralFromPreprocessedCss = (css, expressions) => {
   const quasis = []
   const finalExpressions = []
-  const parts = css.split(/(?:%%styled-jsx-placeholder-(\d+)%%)/g)
+  const parts = css.split(/(?:%%styled-jsx-container-placeholder-(\d+)%%)/g)
 
   if (parts.length === 1) {
     return t.stringLiteral(css)
@@ -475,7 +475,7 @@ export const combinePlugins = plugins => {
         plugin = plugin[0]
         if (Object.prototype.hasOwnProperty.call(options, 'babel')) {
           throw new Error(`
-            Error while trying to register the styled-jsx plugin: ${plugin}
+            Error while trying to register the styled-jsx-container plugin: ${plugin}
             The option name \`babel\` is reserved.
           `)
         }
@@ -660,9 +660,9 @@ export const setStateOptions = state => {
   state.styleModule =
     typeof state.opts.styleModule === 'string'
       ? state.opts.styleModule
-      : 'styled-jsx/style'
+      : 'styled-jsx-container/style'
 }
 
 export function log(message) {
-  console.log('[styled-jsx] ' + message)
+  console.log('[styled-jsx-container] ' + message)
 }

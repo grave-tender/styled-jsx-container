@@ -28,12 +28,12 @@ export default function(content) {
   }
 
   // Allows to define the type for each individual file using a CSS comment.
-  const commentType = content.match(/\/*\s*@styled-jsx=(scoped|global|resolve)/)
+  const commentType = content.match(/\/*\s*@styled-jsx-container=(scoped|global|resolve)/)
   if (commentType) {
     options.type = commentType[1]
   }
 
-  let output = `import css from 'styled-jsx/css';\n\nconst styles = css`
+  let output = `import css from 'styled-jsx-container/css';\n\nconst styles = css`
 
   if (options.type === 'global') {
     // css.global``
