@@ -1,4 +1,3 @@
-require('client-only');
 var React = require('react');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -28,17 +27,18 @@ var isString = function(o) {
 };
 var StyleSheet = /*#__PURE__*/ function() {
     function StyleSheet(param) {
-        var _ref = param === void 0 ? {} : param, _ref_name = _ref.name, name = _ref_name === void 0 ? "stylesheet" : _ref_name, _ref_optimizeForSpeed = _ref.optimizeForSpeed, optimizeForSpeed = _ref_optimizeForSpeed === void 0 ? isProd : _ref_optimizeForSpeed;
+        var _ref = param === void 0 ? {} : param, _ref_name = _ref.name, name = _ref_name === void 0 ? "stylesheet" : _ref_name, _ref_optimizeForSpeed = _ref.optimizeForSpeed, optimizeForSpeed = _ref_optimizeForSpeed === void 0 ? isProd : _ref_optimizeForSpeed, _ref_isBrowser = _ref.isBrowser, isBrowser = _ref_isBrowser === void 0 ? typeof window !== "undefined" : _ref_isBrowser;
         invariant$1(isString(name), "`name` must be a string");
         this._name = name;
         this._deletedRulePlaceholder = "#" + name + "-deleted-rule____{}";
         invariant$1(typeof optimizeForSpeed === "boolean", "`optimizeForSpeed` must be a boolean");
         this._optimizeForSpeed = optimizeForSpeed;
+        this._isBrowser = isBrowser;
         this._serverSheet = undefined;
         this._tags = [];
         this._injected = false;
         this._rulesCount = 0;
-        var node = typeof window !== "undefined" && document.querySelector('meta[property="csp-nonce"]');
+        var node = this._isBrowser && document.querySelector('meta[property="csp-nonce"]');
         this._nonce = node ? node.getAttribute("content") : null;
     }
     var _proto = StyleSheet.prototype;
@@ -56,7 +56,7 @@ var StyleSheet = /*#__PURE__*/ function() {
         var _this = this;
         invariant$1(!this._injected, "sheet already injected");
         this._injected = true;
-        if (typeof window !== "undefined" && this._optimizeForSpeed) {
+        if (this._isBrowser && this._optimizeForSpeed) {
             this._tags[0] = this.makeStyleTag(this._name);
             this._optimizeForSpeed = "insertRule" in this.getSheet();
             if (!this._optimizeForSpeed) {
@@ -103,7 +103,7 @@ var StyleSheet = /*#__PURE__*/ function() {
     };
     _proto.insertRule = function insertRule(rule, index) {
         invariant$1(isString(rule), "`insertRule` accepts only strings");
-        if (typeof window === "undefined") {
+        if (!this._isBrowser) {
             if (typeof index !== "number") {
                 index = this._serverSheet.cssRules.length;
             }
@@ -132,8 +132,8 @@ var StyleSheet = /*#__PURE__*/ function() {
         return this._rulesCount++;
     };
     _proto.replaceRule = function replaceRule(index, rule) {
-        if (this._optimizeForSpeed || typeof window === "undefined") {
-            var sheet = typeof window !== "undefined" ? this.getSheet() : this._serverSheet;
+        if (this._optimizeForSpeed || !this._isBrowser) {
+            var sheet = this._isBrowser ? this.getSheet() : this._serverSheet;
             if (!rule.trim()) {
                 rule = this._deletedRulePlaceholder;
             }
@@ -159,7 +159,7 @@ var StyleSheet = /*#__PURE__*/ function() {
         return index;
     };
     _proto.deleteRule = function deleteRule(index) {
-        if (typeof window === "undefined") {
+        if (!this._isBrowser) {
             this._serverSheet.deleteRule(index);
             return;
         }
@@ -175,7 +175,7 @@ var StyleSheet = /*#__PURE__*/ function() {
     _proto.flush = function flush() {
         this._injected = false;
         this._rulesCount = 0;
-        if (typeof window !== "undefined") {
+        if (this._isBrowser) {
             this._tags.forEach(function(tag) {
                 return tag && tag.parentNode.removeChild(tag);
             });
@@ -187,7 +187,7 @@ var StyleSheet = /*#__PURE__*/ function() {
     };
     _proto.cssRules = function cssRules() {
         var _this = this;
-        if (typeof window === "undefined") {
+        if (!this._isBrowser) {
             return this._serverSheet.cssRules;
         }
         return this._tags.reduce(function(rules, tag) {
@@ -303,9 +303,9 @@ function mapRulesToStyle(cssRules, options) {
 }
 var StyleSheetRegistry = /*#__PURE__*/ function() {
     function StyleSheetRegistry(param) {
-        var _ref = param === void 0 ? {} : param, _ref_styleSheet = _ref.styleSheet, styleSheet = _ref_styleSheet === void 0 ? null : _ref_styleSheet, _ref_optimizeForSpeed = _ref.optimizeForSpeed, optimizeForSpeed = _ref_optimizeForSpeed === void 0 ? false : _ref_optimizeForSpeed;
+        var _ref = param === void 0 ? {} : param, _ref_styleSheet = _ref.styleSheet, styleSheet = _ref_styleSheet === void 0 ? null : _ref_styleSheet, _ref_optimizeForSpeed = _ref.optimizeForSpeed, optimizeForSpeed = _ref_optimizeForSpeed === void 0 ? false : _ref_optimizeForSpeed, _ref_isBrowser = _ref.isBrowser, isBrowser = _ref_isBrowser === void 0 ? typeof window !== "undefined" : _ref_isBrowser;
         this._sheet = styleSheet || new StyleSheet({
-            name: "styled-jsx-container",
+            name: "styled-jsx",
             optimizeForSpeed: optimizeForSpeed
         });
         this._sheet.inject();
@@ -313,6 +313,7 @@ var StyleSheetRegistry = /*#__PURE__*/ function() {
             this._sheet.setOptimizeForSpeed(optimizeForSpeed);
             this._optimizeForSpeed = this._sheet.isOptimizeForSpeed();
         }
+        this._isBrowser = isBrowser;
         this._fromServer = undefined;
         this._indices = {};
         this._instancesCounts = {};
@@ -325,7 +326,7 @@ var StyleSheetRegistry = /*#__PURE__*/ function() {
             this._sheet.setOptimizeForSpeed(this._optimizeForSpeed);
             this._optimizeForSpeed = this._sheet.isOptimizeForSpeed();
         }
-        if (typeof window !== "undefined" && !this._fromServer) {
+        if (this._isBrowser && !this._fromServer) {
             this._fromServer = this.selectFromServer();
             this._instancesCounts = Object.keys(this._fromServer).reduce(function(acc, tagName) {
                 acc[tagName] = 0;
@@ -441,7 +442,6 @@ function invariant(condition, message) {
     }
 }
 var StyleSheetContext = /*#__PURE__*/ React.createContext(null);
-StyleSheetContext.displayName = "StyleSheetContext";
 function createStyleRegistry() {
     return new StyleSheetRegistry();
 }

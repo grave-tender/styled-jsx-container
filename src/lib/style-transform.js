@@ -12,7 +12,7 @@ function disableNestingPlugin(...args) {
     if (parent.length > 0 && parent.charAt(0) !== '@') {
       throw new Error(
         `Nesting detected at ${line}:${column}. ` +
-          'Unfortunately nesting is not supported by styled-jsx-container.'
+          'Unfortunately nesting is not supported by styled-jsx.'
       )
     }
   }

@@ -19,11 +19,15 @@ function mapRulesToStyle(cssRules, options = {}) {
   })
 }
 export class StyleSheetRegistry {
-  constructor({ styleSheet = null, optimizeForSpeed = false } = {}) {
+  constructor({
+    styleSheet = null,
+    optimizeForSpeed = false,
+    isBrowser = typeof window !== 'undefined'
+  } = {}) {
     this._sheet =
       styleSheet ||
       new DefaultStyleSheet({
-        name: 'styled-jsx-container',
+        name: 'styled-jsx',
         optimizeForSpeed
       })
 
@@ -32,6 +36,8 @@ export class StyleSheetRegistry {
       this._sheet.setOptimizeForSpeed(optimizeForSpeed)
       this._optimizeForSpeed = this._sheet.isOptimizeForSpeed()
     }
+
+    this._isBrowser = isBrowser
 
     this._fromServer = undefined
     this._indices = {}
@@ -45,7 +51,7 @@ export class StyleSheetRegistry {
       this._optimizeForSpeed = this._sheet.isOptimizeForSpeed()
     }
 
-    if (typeof window !== 'undefined' && !this._fromServer) {
+    if (this._isBrowser && !this._fromServer) {
       this._fromServer = this.selectFromServer()
       this._instancesCounts = Object.keys(this._fromServer).reduce(
         (acc, tagName) => {
@@ -178,7 +184,6 @@ function invariant(condition, message) {
 }
 
 export const StyleSheetContext = createContext(null)
-StyleSheetContext.displayName = 'StyleSheetContext'
 
 export function createStyleRegistry() {
   return new StyleSheetRegistry()

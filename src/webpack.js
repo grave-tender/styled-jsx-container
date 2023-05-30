@@ -1,8 +1,8 @@
-import loaderUtils from 'loader-utils'
+const loaderUtils = require('loader-utils')
 
 const types = ['scoped', 'global', 'resolve']
 
-export default function(content) {
+module.exports = function(content) {
   if (this.cacheable) this.cacheable()
   this.addDependency(this.resourcePath)
   const options = Object.assign({}, loaderUtils.getOptions(this))
@@ -28,12 +28,12 @@ export default function(content) {
   }
 
   // Allows to define the type for each individual file using a CSS comment.
-  const commentType = content.match(/\/*\s*@styled-jsx-container=(scoped|global|resolve)/)
+  const commentType = content.match(/\/*\s*@styled-jsx=(scoped|global|resolve)/)
   if (commentType) {
     options.type = commentType[1]
   }
 
-  let output = `import css from 'styled-jsx-container/css';\n\nconst styles = css`
+  let output = `import css from 'styled-jsx/css';\n\nconst styles = css`
 
   if (options.type === 'global') {
     // css.global``
@@ -45,7 +45,7 @@ export default function(content) {
   // default css``
 
   // Escape backticks and backslashes: “`” ⇒ “\`”, “\” ⇒ “\\”
-  // (c) https://github.com/coox/styled-jsx-css-loader/blob/97a38e90dddf2c4b066e9247db0612c8f95302de/index.js#L6
+  // (c) https://git.io/fNZzr
   output += `\`${content.replace(
     /[`\\]/g,
     match => '\\' + match

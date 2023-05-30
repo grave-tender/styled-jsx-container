@@ -1,6 +1,8 @@
+// Packages
 import jsx from '@babel/plugin-syntax-jsx'
 
 import { visitor as externalStylesVisitor } from './babel-external'
+
 import {
   isGlobalEl,
   isStyledJsx,
@@ -16,15 +18,12 @@ import {
 } from './_utils'
 import { STYLE_COMPONENT } from './_constants'
 
-import { default as babelMacro } from './macro'
-import { default as babelTest } from './babel-test'
-
 export function macro() {
-  return babelMacro(require('babel-plugin-macros'))
+  return require('./macro')
 }
 
 export function test() {
-  return babelTest
+  return require('./babel-test')
 }
 
 export default function({ types: t }) {
@@ -214,7 +213,7 @@ export default function({ types: t }) {
           throw path.buildCodeFrameError(
             'Detected nested style tag' +
               (styleTagSrc ? `: \n\n${styleTagSrc}\n\n` : ' ') +
-              'styled-jsx-container only allows style tags ' +
+              'styled-jsx only allows style tags ' +
               'to be direct descendants (children) of the outermost ' +
               'JSX element i.e. the subtree root.'
           )
