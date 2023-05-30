@@ -1,6 +1,6 @@
 {
   "name": "styled-jsx-container",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "license": "MIT",
   "repository": "grave-tender/styled-jsx-container",
   "description": "A copy of styled-jsx@5.1.1 work where we manually added support for the new container queries.",
@@ -23,14 +23,14 @@
   ],
   "typings": "./index.d.ts",
   "scripts": {
-    "build-babel": "bunchee src/babel.js -f cjs -e babel-plugin-macros --runtime node -o dist/babel/index.js",
+    "build-babel": "bunchee ./babel.js -f cjs -e babel-plugin-macros --runtime node -o dist/babel/index.js",
     "build": "rm -rf dist && rm -rf out && yarn build-webpack && yarn build-index && yarn build-babel",
-    "build-webpack": "bunchee src/webpack.js -f cjs --runtime node -o dist/webpack/index.js",
-    "build-index": "bunchee src/index.js -f cjs --runtime node -o dist/index/index.js",
+    "build-webpack": "bunchee ./webpack.js -f cjs --runtime node -o dist/webpack/index.js",
+    "build-index": "bunchee ./index.js -f cjs --runtime node -o dist/index/index.js",
     "test": "ava",
-    "lint": "eslint ./src",
-    "format": "prettier --write \"./{src,test}/**/*.{js,css}\"",
-    "prepublishOnly": "yarn build && yarn test && yarn lint --quiet"
+    "lint": "eslint ./",
+    "format": "prettier --write \"./{test}/**/*.{js,css}\"",
+    "prepublishOnly": "yarn build && yarn lint --quiet"
   },
   "husky": {
     "hooks": {
@@ -85,7 +85,7 @@
     "eslint-config-prettier": "4.0.0",
     "husky": "^4.3.8",
     "loader-utils": "^1.4.2",
-    "prettier": "1.16.4",
+    "prettier": "2.0.0",
     "pretty-quick": "3.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -93,7 +93,8 @@
     "source-map": "0.7.3",
     "string-hash": "1.1.3",
     "stylis-cq": "^0.1.0",
-    "stylis-rule-sheet": "0.0.10"
+    "stylis-rule-sheet": "0.0.10",
+    "typescript": "^4.9.5"
   },
   "peerDependencies": {
     "react": ">= 16.8.0 || 17.x.x || ^18.0.0-0"
