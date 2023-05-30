@@ -22929,36 +22929,22 @@ var stylisRuleSheet$1 = { exports: {} }
 var stylisRuleSheet = stylisRuleSheet$1.exports
 
 var stylis = new Stylis()
-function disableNestingPlugin() {
-  for (
-    var _len = arguments.length, args = new Array(_len), _key = 0;
-    _key < _len;
-    _key++
-  ) {
-    args[_key] = arguments[_key]
-  }
-  var context = args[0],
-    tmp = args[3],
-    parent = tmp === void 0 ? [] : tmp,
-    line = args[4],
-    column = args[5]
+/*
+function disableNestingPlugin(...args) {
+  let [context, , , parent = [], line, column] = args
   if (context === 2) {
     // replace null characters and trim
     // eslint-disable-next-line no-control-regex
     parent = (parent[0] || '').replace(/\u0000/g, '').trim()
     if (parent.length > 0 && parent.charAt(0) !== '@') {
       throw new Error(
-        'Nesting detected at ' +
-          line +
-          ':' +
-          column +
-          '. ' +
-          'Unfortunately nesting is not supported by styled-jsx.'
+        `Nesting detected at ${line}:${column}. ` +
+          'Unfortunately nesting is not supported by styled-jsx-container.'
       )
     }
   }
 }
-var generator
+*/ var generator
 var filename
 var offset
 function sourceMapsPlugin() {
@@ -23015,7 +23001,7 @@ function sourceMapsPlugin() {
 var splitRulesPlugin = stylisRuleSheet(function (rule) {
   splitRules.push(rule)
 })
-stylis.use(disableNestingPlugin)
+// stylis.use(disableNestingPlugin)
 stylis.use(sourceMapsPlugin)
 stylis.use(splitRulesPlugin)
 stylis.set({

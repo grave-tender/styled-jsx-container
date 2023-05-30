@@ -3,6 +3,7 @@ import stylisRuleSheet from 'stylis-rule-sheet'
 
 const stylis = new Stylis()
 
+/*
 function disableNestingPlugin(...args) {
   let [context, , , parent = [], line, column] = args
   if (context === 2) {
@@ -12,11 +13,12 @@ function disableNestingPlugin(...args) {
     if (parent.length > 0 && parent.charAt(0) !== '@') {
       throw new Error(
         `Nesting detected at ${line}:${column}. ` +
-          'Unfortunately nesting is not supported by styled-jsx.'
+          'Unfortunately nesting is not supported by styled-jsx-container.'
       )
     }
   }
 }
+*/
 
 let generator
 let filename
@@ -75,7 +77,7 @@ const splitRulesPlugin = stylisRuleSheet((rule) => {
   splitRules.push(rule)
 })
 
-stylis.use(disableNestingPlugin)
+// stylis.use(disableNestingPlugin)
 stylis.use(sourceMapsPlugin)
 stylis.use(splitRulesPlugin)
 stylis.set({
