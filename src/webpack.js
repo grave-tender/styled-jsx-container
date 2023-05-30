@@ -1,4 +1,4 @@
-const loaderUtils = require('loader-utils')
+const loaderUtils = require('loader-utils').default
 
 const types = ['scoped', 'global', 'resolve']
 

@@ -1,4 +1,4 @@
-var loaderUtils = require("loader-utils");
+var loaderUtils = require("loader-utils").default;
 var types = [
     "scoped",
     "global",
