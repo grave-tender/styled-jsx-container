@@ -4128,6 +4128,40 @@ var builder$1 = {};
 
 var definitions = {};
 
+function _type_of$4(obj) {
+    "@swc/helpers - typeof";
+    return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
+}
+var toFastProperties;
+var hasRequiredToFastProperties;
+function requireToFastProperties() {
+    if (hasRequiredToFastProperties) return toFastProperties;
+    hasRequiredToFastProperties = 1;
+    var fastProto = null;
+    // Creates an object with permanently fast properties in V8. See Toon Verwaest's
+    // post https://medium.com/@tverwaes/setting-up-prototypes-in-v8-ec9c9491dfe2#5f62
+    // for more details. Use %HasFastProperties(object) and the Node.js flag
+    // --allow-natives-syntax to check whether an object has fast properties.
+    function FastObject(o) {
+        // A prototype object will have "fast properties" enabled once it is checked
+        // against the inline property cache of a function, e.g. fastProto.property:
+        // https://github.com/v8/v8/blob/6.0.122/test/mjsunit/fast-prototype.js#L48-L63
+        if (fastProto !== null && _type_of$4(fastProto.property)) {
+            var result = fastProto;
+            fastProto = FastObject.prototype = null;
+            return result;
+        }
+        fastProto = FastObject.prototype = o == null ? Object.create(null) : o;
+        return new FastObject;
+    }
+    // Initialize the inline property cache of FastObject
+    FastObject();
+    toFastProperties = function toFastproperties(o) {
+        return FastObject(o);
+    };
+    return toFastProperties;
+}
+
 var core = {};
 
 var is = {};
@@ -10478,6 +10512,7 @@ function requireDefinitions() {
             }
         });
         exports.TYPES = void 0;
+        var _toFastProperties = requireToFastProperties();
         requireCore();
         requireFlow();
         requireJsx();
@@ -10486,6 +10521,14 @@ function requireDefinitions() {
         requireTypescript();
         var _utils = requireUtils();
         var _placeholders = requirePlaceholders();
+        _toFastProperties(_utils.VISITOR_KEYS);
+        _toFastProperties(_utils.ALIAS_KEYS);
+        _toFastProperties(_utils.FLIPPED_ALIAS_KEYS);
+        _toFastProperties(_utils.NODE_FIELDS);
+        _toFastProperties(_utils.BUILDER_KEYS);
+        _toFastProperties(_utils.DEPRECATED_KEYS);
+        _toFastProperties(_placeholders.PLACEHOLDERS_ALIAS);
+        _toFastProperties(_placeholders.PLACEHOLDERS_FLIPPED_ALIAS);
         var TYPES = Object.keys(_utils.VISITOR_KEYS).concat(Object.keys(_utils.FLIPPED_ALIAS_KEYS)).concat(Object.keys(_utils.DEPRECATED_KEYS));
         exports.TYPES = TYPES;
     })(definitions);
@@ -20493,6 +20536,7 @@ var stylis$1 = {exports: {}};
         var VERTICALTAB = 11 /* \v */ ;
         /* special identifiers */ var KEYFRAME = 107 /* k */ ;
         var MEDIA = 109 /* m */ ;
+        var CONTAINER = 99 /* c */ ;
         var SUPPORTS = 115 /* s */ ;
         var PLACEHOLDER = 112 /* p */ ;
         var READONLY = 111 /* o */ ;
@@ -20730,10 +20774,20 @@ var stylis$1 = {exports: {}};
                                             if (format > 0) {
                                                 chars = chars.replace(formatptn, "");
                                             }
-                                            second = chars.charCodeAt(1);
+                                            //ooh here we use charCodeAt at the position 1 cuz position 0 is the @
+                                            /**
+									 * if the first character is same as CHARSET aka 99
+									 * and if the third character is 110 aka 'n'
+									 * then
+									 * second will become MEDIA, aka 109 'm'
+									 * otherwise second will become whatever was the first character
+									 */ //h = 104, o = 111
+                                            var third = chars.charCodeAt(2);
+                                            second = chars.charCodeAt(1) === CHARSET && third === 104 ? MEDIA : chars.charCodeAt(1);
                                             switch(second){
                                                 case DOCUMENT:
                                                 case MEDIA:
+                                                case CONTAINER:
                                                 case SUPPORTS:
                                                 case DASH:
                                                     {
@@ -20771,6 +20825,7 @@ var stylis$1 = {exports: {}};
                                                         }
                                                     case DOCUMENT:
                                                     case MEDIA:
+                                                    case CONTAINER:
                                                     case DASH:
                                                         {
                                                             child = chars + "{" + child + "}";
@@ -20842,6 +20897,7 @@ var stylis$1 = {exports: {}};
                                     }
                                     first = chars.charCodeAt(0);
                                     second = chars.charCodeAt(1);
+                                    var third1 = chars.charCodeAt(2);
                                     switch(first){
                                         case NULL:
                                             {
@@ -20849,7 +20905,9 @@ var stylis$1 = {exports: {}};
                                             }
                                         case AT:
                                             {
-                                                if (second === IMPORT || second === CHARSET) {
+                                                //here checking if the at rule is different from container by checking if the third character in the at rule is different from 111 aka 'o'
+                                                //we want to avoid confusing charset and container and must behave differently
+                                                if ((second === IMPORT || second === CHARSET) && third1 !== 111) {
                                                     flat += chars + body.charAt(caret);
                                                     break;
                                                 }
@@ -21241,7 +21299,7 @@ var stylis$1 = {exports: {}};
             // preserve empty selector
             if (preserve > 0) {
                 if (length === 0 && children.length === 0 && current[0].length === 0 === false) {
-                    if (id !== MEDIA || current.length === 1 && (cascade > 0 ? nscopealt : nscope) === current[0]) {
+                    if (id !== MEDIA && id !== CONTAINER || current.length === 1 && (cascade > 0 ? nscopealt : nscope) === current[0]) {
                         length = current.join(",").length + 2;
                     }
                 }

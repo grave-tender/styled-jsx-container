@@ -1,6 +1,6 @@
 {
   "name": "styled-jsx-container",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "license": "MIT",
   "repository": "grave-tender/styled-jsx-container",
   "description": "A copy of styled-jsx@5.1.1 work where we manually added support for the new container queries.",

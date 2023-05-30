@@ -1,4 +1,4 @@
-import Stylis from 'stylis'
+import Stylis from 'stylis-cq'
 import stylisRuleSheet from 'stylis-rule-sheet'
 
 const stylis = new Stylis()
