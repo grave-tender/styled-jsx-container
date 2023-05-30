@@ -3,7 +3,7 @@ import 'client-only'
 export {
   StyleRegistry,
   createStyleRegistry,
-  useStyleRegistry,
+  useStyleRegistry
 } from './stylesheet-registry'
 
 export { default as style } from './style'

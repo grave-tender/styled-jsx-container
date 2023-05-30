@@ -1,1 +1,1 @@
-export default (css) => css.replace(/div/g, 'span')
+export default css => css.replace(/div/g, 'span')

@@ -1,9 +1,8 @@
-import Stylis from 'stylis-cq'
+import Stylis from 'stylis'
 import stylisRuleSheet from 'stylis-rule-sheet'
 
 const stylis = new Stylis()
 
-/*
 function disableNestingPlugin(...args) {
   let [context, , , parent = [], line, column] = args
   if (context === 2) {
@@ -13,12 +12,11 @@ function disableNestingPlugin(...args) {
     if (parent.length > 0 && parent.charAt(0) !== '@') {
       throw new Error(
         `Nesting detected at ${line}:${column}. ` +
-          'Unfortunately nesting is not supported by styled-jsx-container.'
+          'Unfortunately nesting is not supported by styled-jsx.'
       )
     }
   }
 }
-*/
 
 let generator
 let filename
@@ -32,10 +30,10 @@ function sourceMapsPlugin(...args) {
     generator.addMapping({
       generated: {
         line: 1,
-        column: 0,
+        column: 0
       },
       source: filename,
-      original: offset,
+      original: offset
     })
 
     return
@@ -55,13 +53,13 @@ function sourceMapsPlugin(...args) {
     generator.addMapping({
       generated: {
         line: 1,
-        column: length,
+        column: length
       },
       source: filename,
       original: {
         line: line + offset.line,
-        column: column + offset.column,
-      },
+        column: column + offset.column
+      }
     })
   }
 }
@@ -73,16 +71,16 @@ function sourceMapsPlugin(...args) {
  */
 let splitRules = []
 
-const splitRulesPlugin = stylisRuleSheet((rule) => {
+const splitRulesPlugin = stylisRuleSheet(rule => {
   splitRules.push(rule)
 })
 
-// stylis.use(disableNestingPlugin)
+stylis.use(disableNestingPlugin)
 stylis.use(sourceMapsPlugin)
 stylis.use(splitRulesPlugin)
 stylis.set({
   cascade: false,
-  compress: true,
+  compress: true
 })
 
 /**
@@ -103,7 +101,7 @@ function transform(hash, styles, settings = {}) {
     prefix:
       typeof settings.vendorPrefixes === 'boolean'
         ? settings.vendorPrefixes
-        : true,
+        : true
   })
 
   stylis(hash, styles)

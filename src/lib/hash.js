@@ -1,6 +1,6 @@
 import hashString from 'string-hash'
 
-const sanitize = (rule) => rule.replace(/\/style/gi, '\\/style')
+const sanitize = rule => rule.replace(/\/style/gi, '\\/style')
 const cache = {}
 
 /**

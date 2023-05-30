@@ -12,7 +12,7 @@ import {
   getScope,
   processCss,
   createReactComponentImportDeclaration,
-  setStateOptions,
+  setStateOptions
 } from './_utils'
 import { STYLE_COMPONENT } from './_constants'
 
@@ -27,7 +27,7 @@ export function test() {
   return babelTest
 }
 
-export default function ({ types: t }) {
+export default function({ types: t }) {
   const jsxVisitors = {
     JSXOpeningElement(path, state) {
       const el = path.node
@@ -53,8 +53,8 @@ export default function ({ types: t }) {
         name !== 'style' &&
         name !== state.styleComponentImportName &&
         (name.charAt(0) !== name.charAt(0).toUpperCase() ||
-          Object.values(path.scope.bindings).some((binding) =>
-            binding.referencePaths.some((r) => r === tag)
+          Object.values(path.scope.bindings).some(binding =>
+            binding.referencePaths.some(r => r === tag)
           ))
       ) {
         if (state.className) {
@@ -85,7 +85,7 @@ export default function ({ types: t }) {
         for (const style of styles) {
           // Compute children excluding whitespace
           const children = style.get('children').filter(
-            (c) =>
+            c =>
               t.isJSXExpressionContainer(c.node) ||
               // Ignore whitespace around the expression container
               (t.isJSXText(c.node) && c.node.value.trim() !== '')
@@ -122,7 +122,7 @@ export default function ({ types: t }) {
                   t.identifier('__hash')
                 ),
                 externalStylesIdentifier,
-                isGlobal,
+                isGlobal
               ])
               continue
             }
@@ -154,8 +154,8 @@ export default function ({ types: t }) {
         if (state.externalStyles.length > 0) {
           const expressions = state.externalStyles
             // Remove globals
-            .filter((s) => !s[2])
-            .map((s) => s[0])
+            .filter(s => !s[2])
+            .map(s => s[0])
 
           const expressionsLength = expressions.length
 
@@ -170,7 +170,7 @@ export default function ({ types: t }) {
                 ...[...new Array(expressionsLength - 1).fill(null)].map(() =>
                   t.templateElement({ raw: ' jsx-', cooked: ' jsx-' })
                 ),
-                t.templateElement({ raw: '', cooked: '' }, true),
+                t.templateElement({ raw: '', cooked: '' }, true)
               ],
               expressions
             )
@@ -222,7 +222,7 @@ export default function ({ types: t }) {
 
         if (
           state.externalStyles.length > 0 &&
-          path.get('children').filter((child) => {
+          path.get('children').filter(child => {
             if (!t.isJSXExpressionContainer(child)) {
               return false
             }
@@ -247,7 +247,7 @@ export default function ({ types: t }) {
           isGlobal,
           plugins: state.plugins,
           vendorPrefixes,
-          sourceMaps,
+          sourceMaps
         }
         const splitRules =
           typeof state.opts.optimizeForSpeed === 'boolean'
@@ -255,7 +255,7 @@ export default function ({ types: t }) {
             : process.env.NODE_ENV === 'production'
 
         const { hash, css, expressions } = processCss(stylesInfo, {
-          splitRules,
+          splitRules
         })
 
         path.replaceWith(
@@ -266,8 +266,8 @@ export default function ({ types: t }) {
             state.styleComponentImportName
           )
         )
-      },
-    },
+      }
+    }
   }
 
   // only apply JSXFragment visitor if supported
@@ -289,7 +289,7 @@ export default function ({ types: t }) {
         }
 
         state.ignoreClosing++
-      },
+      }
     }
   }
 
@@ -323,9 +323,9 @@ export default function ({ types: t }) {
           state.file.hasJSXStyle = true
           const importDeclaration = createReactComponentImportDeclaration(state)
           path.unshiftContainer('body', importDeclaration)
-        },
-      },
-    },
+        }
+      }
+    }
   }
 
   return visitors

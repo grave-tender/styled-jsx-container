@@ -5,12 +5,12 @@ import test from 'ava'
 import transform from '../src/lib/style-transform'
 import read from './_read'
 
-test('transpile styles with attributes', async (t) => {
+test('transpile styles with attributes', async t => {
   const src = await read('./fixtures/transform.css')
   t.snapshot(transform('.jsx-123', src))
 })
 
-test('throws when using nesting', (t) => {
+test('throws when using nesting', t => {
   const fixtures = [
     `div { &:hover { color: red } }`,
     `div {
@@ -33,16 +33,16 @@ test('throws when using nesting', (t) => {
       div& {
         color: red;
       }
-    }`,
+    }`
   ]
 
-  fixtures.forEach((fixture) => {
+  fixtures.forEach(fixture => {
     t.throws(() => transform('', fixture))
     t.throws(() => transform('.jsx-123', fixture))
   })
 })
 
-test("doesn't throw when using at-rules", (t) => {
+test("doesn't throw when using at-rules", t => {
   const fixtures = [
     '@media (min-width: 480px) { div { color: red } }',
     `span {}
@@ -72,16 +72,16 @@ test("doesn't throw when using at-rules", (t) => {
      @media screen and (min-width: 480px) {
        div { color: red; }
      }
-    `,
+    `
   ]
 
-  fixtures.forEach((fixture) => {
+  fixtures.forEach(fixture => {
     t.notThrows(() => transform('', fixture))
     t.notThrows(() => transform('.jsx-123', fixture))
   })
 })
 
-test('splits rules for `optimizeForSpeed`', (t) => {
+test('splits rules for `optimizeForSpeed`', t => {
   function assert(input, expected, prefix = '') {
     t.deepEqual(transform(prefix, input, { splitRules: true }), expected)
   }
@@ -90,12 +90,12 @@ test('splits rules for `optimizeForSpeed`', (t) => {
 
   assert('div { color: red } .p { color: red }', [
     'div{color:red;}',
-    '.p{color:red;}',
+    '.p{color:red;}'
   ])
 
   assert('div, span { color: red } a > .p { color: red }', [
     'div,span{color:red;}',
-    'a>.p{color:red;}',
+    'a>.p{color:red;}'
   ])
 
   assert(
@@ -107,7 +107,7 @@ test('splits rules for `optimizeForSpeed`', (t) => {
     '@media (min-width: 400px) { div { color: red } span { color: red } } a > .p { color: red }',
     [
       '@media (min-width:400px){div{color:red;}span{color:red;}}',
-      'a>.p{color:red;}',
+      'a>.p{color:red;}'
     ]
   )
 
@@ -118,7 +118,7 @@ test('splits rules for `optimizeForSpeed`', (t) => {
       }
     }`,
     [
-      `@media (min-width:1px) and (max-width:768px){[class*='test__test--']{color:red;}}`,
+      `@media (min-width:1px) and (max-width:768px){[class*='test__test--']{color:red;}}`
     ]
   )
 
@@ -127,7 +127,7 @@ test('splits rules for `optimizeForSpeed`', (t) => {
     [
       '@font-face{font-family:test;src:url(test.woff);}',
       'span{color:red;}',
-      'div{color:red;}',
+      'div{color:red;}'
     ]
   )
 
@@ -144,7 +144,7 @@ test('splits rules for `optimizeForSpeed`', (t) => {
   `,
     [
       '@-webkit-keyframes test{0%{opacity:0;}100%{opacity:1;}}',
-      '@keyframes test{0%{opacity:0;}100%{opacity:1;}}',
+      '@keyframes test{0%{opacity:0;}100%{opacity:1;}}'
     ]
   )
 
@@ -155,7 +155,7 @@ test('splits rules for `optimizeForSpeed`', (t) => {
     }
   `,
     [
-      '@supports (display:-webkit-box) or (display:-webkit-flex) or (display:-ms-flexbox) or (display:flex){div{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;}}',
+      '@supports (display:-webkit-box) or (display:-webkit-flex) or (display:-ms-flexbox) or (display:flex){div{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;}}'
     ]
   )
 
@@ -176,15 +176,15 @@ test('splits rules for `optimizeForSpeed`', (t) => {
       '@supports (display:-webkit-box) or (display:-webkit-flex) or (display:-ms-flexbox) or (display:flex){div{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;}}',
       'div{color:red;}',
       'a,div{color:red;}',
-      '@media (min-width:400px){div,span{color:red;}}',
+      '@media (min-width:400px){div,span{color:red;}}'
     ]
   )
 
   assert('@namespace url(http://www.w3.org/1999/xhtml)', [
-    '@namespace url(http://www.w3.org/1999/xhtml);',
+    '@namespace url(http://www.w3.org/1999/xhtml);'
   ])
   assert('@namespace svg url(http://www.w3.org/2000/svg)', [
-    '@namespace svg url(http://www.w3.org/2000/svg);',
+    '@namespace svg url(http://www.w3.org/2000/svg);'
   ])
   assert('@page :first { margin: 1in; }', ['@page :first{margin:1in;}'])
 
@@ -209,7 +209,7 @@ test('splits rules for `optimizeForSpeed`', (t) => {
     [
       'div.jsx-123{-webkit-animation:fade-in-jsx-123 ease-in 1;animation:fade-in-jsx-123 ease-in 1;-webkit-animation-fill-mode:forwards;animation-fill-mode:forwards;-webkit-animation-duration:500ms;animation-duration:500ms;opacity:0;}',
       '@-webkit-keyframes fade-in-jsx-123{from{opacity:0;}to{opacity:1;}}',
-      '@keyframes fade-in-jsx-123{from{opacity:0;}to{opacity:1;}}',
+      '@keyframes fade-in-jsx-123{from{opacity:0;}to{opacity:1;}}'
     ],
     '.jsx-123'
   )
@@ -236,7 +236,7 @@ test('splits rules for `optimizeForSpeed`', (t) => {
     [
       'div{-webkit-animation:fade-in ease-in 1;animation:fade-in ease-in 1;-webkit-animation-fill-mode:forwards;animation-fill-mode:forwards;-webkit-animation-duration:500ms;animation-duration:500ms;opacity:0;}',
       '@-webkit-keyframes fade-in{from{opacity:0;}to{opacity:1;}}',
-      '@keyframes fade-in{from{opacity:0;}to{opacity:1;}}',
+      '@keyframes fade-in{from{opacity:0;}to{opacity:1;}}'
     ]
   )
 
@@ -247,7 +247,7 @@ test('splits rules for `optimizeForSpeed`', (t) => {
       '.jsx-123::-webkit-input-placeholder{color:green;}',
       '.jsx-123::-moz-placeholder{color:green;}',
       '.jsx-123:-ms-input-placeholder{color:green;}',
-      '.jsx-123::placeholder{color:green;}',
+      '.jsx-123::placeholder{color:green;}'
     ],
     '.jsx-123'
   )

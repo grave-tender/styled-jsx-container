@@ -1,7 +1,7 @@
 import { processTaggedTemplateExpression } from './babel-external'
 import {
   setStateOptions,
-  createReactComponentImportDeclaration,
+  createReactComponentImportDeclaration
 } from './_utils'
 import { STYLE_COMPONENT } from './_constants'
 
@@ -22,7 +22,7 @@ export default ({ createMacro, MacroError }) => {
     //    default: [path, path],
     //    resolve: [path],
     // }
-    Object.keys(references).forEach((refName) => {
+    Object.keys(references).forEach(refName => {
       // Enforce `resolve` as named import so people
       // can only import { resolve } from 'styled-jsx/macro'
       // or an alias of it eg. { resolve as foo }
@@ -33,7 +33,7 @@ export default ({ createMacro, MacroError }) => {
       }
 
       // Start processing the references for refName
-      references[refName].forEach((path) => {
+      references[refName].forEach(path => {
         // We grab the parent path. Eg.
         // path -> css
         // path.parenPath -> css`div { color: red }`
@@ -49,7 +49,13 @@ export default ({ createMacro, MacroError }) => {
           // eg. import css from 'styled-jsx/macro'
           if (refName !== 'default') {
             throw new MacroError(
-              `Can't use named import ${path.node.name} as a member expression: ${path.node.name}.${tagPropertyName}\`div { color: red }\` Please use it directly: ${path.node.name}\`div { color: red }\``
+              `Can't use named import ${
+                path.node.name
+              } as a member expression: ${
+                path.node.name
+              }.${tagPropertyName}\`div { color: red }\` Please use it directly: ${
+                path.node.name
+              }\`div { color: red }\``
             )
           }
 
@@ -80,7 +86,7 @@ export default ({ createMacro, MacroError }) => {
         }
 
         if (!state.styleComponentImportName) {
-          const programPath = path.findParent((p) => p.isProgram())
+          const programPath = path.findParent(p => p.isProgram())
           state.styleComponentImportName = programPath.scope.generateUidIdentifier(
             STYLE_COMPONENT
           ).name
@@ -100,7 +106,7 @@ export default ({ createMacro, MacroError }) => {
           plugins: state.plugins,
           vendorPrefixes: state.opts.vendorPrefixes,
           sourceMaps: state.opts.sourceMaps,
-          styleComponentImportName: state.styleComponentImportName,
+          styleComponentImportName: state.styleComponentImportName
         })
       })
     })

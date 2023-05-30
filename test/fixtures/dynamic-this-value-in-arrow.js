@@ -8,14 +8,14 @@ export default class Index extends Component {
   render() {
     return (
       <div>
-        {[1, 2].map((idx) => (
+        {[1, 2].map(idx => (
           <div key={idx}>
-            {[3, 4].map((idx2) => (
+            {[3, 4].map(idx2 => (
               <div key={idx2}>{this.props.color}</div>
             ))}
           </div>
         ))}
-        {[1, 2].map((idx) => (
+        {[1, 2].map(idx => (
           <div key={idx}>
             <div>
               {this.props.color}

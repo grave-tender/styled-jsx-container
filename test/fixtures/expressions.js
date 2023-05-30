@@ -1,4 +1,4 @@
-const darken = (c) => c
+const darken = c => c
 const color = 'red'
 const otherColor = 'green'
 const mediumScreen = '680px'

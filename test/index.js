@@ -9,7 +9,7 @@ import JSXStyle from '../src/style'
 import {
   StyleRegistry,
   useStyleRegistry,
-  createStyleRegistry,
+  createStyleRegistry
 } from '../src/stylesheet-registry'
 import _transform, { transformSource as _transformSource } from './_transform'
 
@@ -27,7 +27,7 @@ const flushToHTML = (registry, options = {}) => {
 }
 
 function mapCssRulesToReact(cssRules, options = {}) {
-  return cssRules.map((args) => {
+  return cssRules.map(args => {
     const id = args[0]
     const css = args[1]
     return React.createElement('style', {
@@ -36,8 +36,8 @@ function mapCssRulesToReact(cssRules, options = {}) {
       key: `__${id}`,
       nonce: options.nonce ? options.nonce : undefined,
       dangerouslySetInnerHTML: {
-        __html: css,
-      },
+        __html: css
+      }
     })
   })
 }
@@ -51,140 +51,140 @@ function flushToReact(registry, options = {}) {
 const transform = (file, opts = {}) =>
   _transform(file, {
     plugins: [plugin],
-    ...opts,
+    ...opts
   })
 
 const transformSource = (src, opts = {}) =>
   _transformSource(src.trim(), {
     plugins: [[plugin, opts]],
-    ...opts,
+    ...opts
   })
 
-test('handles dynamic `this` value inside of arrow function', async (t) => {
+test('handles dynamic `this` value inside of arrow function', async t => {
   const { code } = await transform(
     './fixtures/dynamic-this-value-in-arrow.js',
     {
-      plugins: ['@babel/plugin-transform-arrow-functions', plugin],
+      plugins: ['@babel/plugin-transform-arrow-functions', plugin]
     }
   )
   t.snapshot(code)
 })
 
-test('works with stateless', async (t) => {
+test('works with stateless', async t => {
   const { code } = await transform('./fixtures/stateless.js')
   t.snapshot(code)
 })
 
-test('works with fragment', async (t) => {
+test('works with fragment', async t => {
   const { code } = await transform('./fixtures/fragment.js')
   t.snapshot(code)
 })
 
-test('ignores whitespace around expression container', async (t) => {
+test('ignores whitespace around expression container', async t => {
   const { code } = await transform('./fixtures/whitespace.js')
   t.snapshot(code)
 })
 
-test('works with class', async (t) => {
+test('works with class', async t => {
   const { code } = await transform('./fixtures/class.js')
   t.snapshot(code)
 })
 
-test('ignores when attribute is absent', async (t) => {
+test('ignores when attribute is absent', async t => {
   const { code } = await transform('./fixtures/absent.js')
   t.snapshot(code)
 })
 
-test('works with global styles', async (t) => {
+test('works with global styles', async t => {
   const { code } = await transform('./fixtures/global.js')
   t.snapshot(code)
 })
 
-test('generates source maps', async (t) => {
+test('generates source maps', async t => {
   const { code } = await transform('./fixtures/source-maps.js', {
-    plugins: [[plugin, { sourceMaps: true }]],
+    plugins: [[plugin, { sourceMaps: true }]]
   })
   t.snapshot(code)
 })
 
-test('mixed global and scoped', async (t) => {
+test('mixed global and scoped', async t => {
   const { code } = await transform('./fixtures/mixed-global-scoped.js')
   t.snapshot(code)
 })
 
-test('works with multiple jsx blocks', async (t) => {
+test('works with multiple jsx blocks', async t => {
   const { code } = await transform('./fixtures/multiple-jsx.js')
   t.snapshot(code)
 })
 
-test('should not add the data-jsx attribute to components instances', async (t) => {
+test('should not add the data-jsx attribute to components instances', async t => {
   const { code } = await transform('./fixtures/component-attribute.js')
   t.snapshot(code)
 })
 
-test('works with expressions in template literals', async (t) => {
+test('works with expressions in template literals', async t => {
   const { code } = await transform('./fixtures/expressions.js')
   t.snapshot(code)
 })
 
-test('should have different jsx ids', async (t) => {
+test('should have different jsx ids', async t => {
   const { code } = await transform('./fixtures/different-jsx-ids.js')
   t.snapshot(code)
 })
 
-test('works with non styled-jsx styles', async (t) => {
+test('works with non styled-jsx styles', async t => {
   const { code } = await transform('./fixtures/non-styled-jsx-style.js')
   t.snapshot(code)
 })
 
-test('works with css tagged template literals in the same file', async (t) => {
+test('works with css tagged template literals in the same file', async t => {
   const { code } = await transform('./fixtures/css-tag-same-file.js')
   t.snapshot(code)
 })
 
-test('works with dynamic element', async (t) => {
+test('works with dynamic element', async t => {
   const { code } = await transform('./fixtures/dynamic-element.js')
   t.snapshot(code)
 })
 
-test('works with dynamic element in class', async (t) => {
+test('works with dynamic element in class', async t => {
   const { code } = await transform('./fixtures/dynamic-element-class.js')
   t.snapshot(code)
 })
 
-test('works with existing identifier for _JSXStyle', async (t) => {
+test('works with existing identifier for _JSXStyle', async t => {
   const { code } = await transform('./fixtures/conflicts.js')
   t.snapshot(code)
 })
 
-test('does not transpile nested style tags', async (t) => {
+test('does not transpile nested style tags', async t => {
   const { message } = await t.throwsAsync(() =>
     transform('./fixtures/nested-style-tags.js')
   )
   t.regex(message, /detected nested style tag/i)
 })
 
-test('works with exported jsx-style (CommonJS modules)', async (t) => {
+test('works with exported jsx-style (CommonJS modules)', async t => {
   const { code } = await transformSource(
     'module.exports = () => <p><style jsx>{`p { color:red; }`}</style></p>',
     {
-      plugins: [plugin, '@babel/plugin-transform-modules-commonjs'],
+      plugins: [plugin, '@babel/plugin-transform-modules-commonjs']
     }
   )
   t.snapshot(code)
 })
 
-test('works with exported non-jsx style (CommonJS modules)', async (t) => {
+test('works with exported non-jsx style (CommonJS modules)', async t => {
   const { code } = await transformSource(
     'module.exports = () => <p><style>{`p { color:red; }`}</style></p>',
     {
-      plugins: [plugin, '@babel/plugin-transform-modules-commonjs'],
+      plugins: [plugin, '@babel/plugin-transform-modules-commonjs']
     }
   )
   t.snapshot(code)
 })
 
-test('sever rendering with hook api', (t) => {
+test('sever rendering with hook api', t => {
   const registry = createStyleRegistry()
   function Head() {
     const registry = useStyleRegistry()
@@ -214,7 +214,7 @@ test('sever rendering with hook api', (t) => {
 
   const expected = `<head>${styles}</head>`
 
-  const createContextualApp = (type) =>
+  const createContextualApp = type =>
     React.createElement(StyleRegistry, { registry }, React.createElement(type))
 
   // Render using react
@@ -223,7 +223,7 @@ test('sever rendering with hook api', (t) => {
   t.is(html, expected)
 })
 
-test('server rendering', (t) => {
+test('server rendering', t => {
   function App() {
     const color = 'green'
     return React.createElement(
@@ -232,21 +232,21 @@ test('server rendering', (t) => {
       React.createElement(
         JSXStyle,
         {
-          id: 1,
+          id: 1
         },
         'p { color: red }'
       ),
       React.createElement(
         JSXStyle,
         {
-          id: 2,
+          id: 2
         },
         'div { color: blue }'
       ),
       React.createElement(
         JSXStyle,
         {
-          id: 3,
+          id: 3
         },
         `div { color: ${color} }`
       )
@@ -284,7 +284,7 @@ test('server rendering', (t) => {
   t.is('', flushToHTML(registry))
 })
 
-test('server rendering with nonce', (t) => {
+test('server rendering with nonce', t => {
   function App() {
     const color = 'green'
     return React.createElement(
@@ -293,21 +293,21 @@ test('server rendering with nonce', (t) => {
       React.createElement(
         JSXStyle,
         {
-          id: 1,
+          id: 1
         },
         'p { color: red }'
       ),
       React.createElement(
         JSXStyle,
         {
-          id: 2,
+          id: 2
         },
         'div { color: blue }'
       ),
       React.createElement(
         JSXStyle,
         {
-          id: 3,
+          id: 3
         },
         `div { color: ${color} }`
       )
@@ -349,7 +349,7 @@ test('server rendering with nonce', (t) => {
   t.is('', flushToHTML(registry, { nonce: 'test-nonce' }))
 })
 
-test('optimized styles do not contain new lines', (t) => {
+test('optimized styles do not contain new lines', t => {
   function App() {
     return React.createElement(
       'div',
@@ -357,7 +357,7 @@ test('optimized styles do not contain new lines', (t) => {
       React.createElement(
         JSXStyle,
         {
-          id: 1,
+          id: 1
         },
         ['p { color: red }', '.foo { color: hotpink }']
       )

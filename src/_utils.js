@@ -9,16 +9,16 @@ import {
   STYLE_ATTRIBUTE,
   GLOBAL_ATTRIBUTE,
   STYLE_COMPONENT_ID,
-  STYLE_COMPONENT_DYNAMIC,
+  STYLE_COMPONENT_DYNAMIC
 } from './_constants'
 
 const concat = (a, b) => t.binaryExpression('+', a, b)
 const and = (a, b) => t.logicalExpression('&&', a, b)
 const or = (a, b) => t.logicalExpression('||', a, b)
 
-const joinSpreads = (spreads) => spreads.reduce((acc, curr) => or(acc, curr))
+const joinSpreads = spreads => spreads.reduce((acc, curr) => or(acc, curr))
 
-export const hashString = (str) => String(_hashString(str))
+export const hashString = str => String(_hashString(str))
 
 export const addClassName = (path, jsxId) => {
   const jsxIdWithSpace = concat(jsxId, t.stringLiteral(' '))
@@ -34,7 +34,7 @@ export const addClassName = (path, jsxId) => {
         const properties = node.argument.properties
 
         const index = properties.findIndex(
-          (property) => property.key.name === 'className'
+          property => property.key.name === 'className'
         )
 
         if (~index) {
@@ -108,27 +108,25 @@ export const addClassName = (path, jsxId) => {
   )
 }
 
-export const getScope = (path) =>
+export const getScope = path =>
   (
     path.findParent(
-      (path) =>
+      path =>
         path.isFunctionDeclaration() ||
         path.isArrowFunctionExpression() ||
         path.isClassMethod()
     ) || path
   ).scope
 
-export const isGlobalEl = (el) =>
+export const isGlobalEl = el =>
   el && el.attributes.some(({ name }) => name && name.name === GLOBAL_ATTRIBUTE)
 
 export const isStyledJsx = ({ node: el }) =>
   t.isJSXElement(el) &&
   el.openingElement.name.name === 'style' &&
-  el.openingElement.attributes.some(
-    (attr) => attr.name.name === STYLE_ATTRIBUTE
-  )
+  el.openingElement.attributes.some(attr => attr.name.name === STYLE_ATTRIBUTE)
 
-export const findStyles = (path) => {
+export const findStyles = path => {
   if (isStyledJsx(path)) {
     const { node } = path
     return isGlobalEl(node.openingElement) ? [path] : []
@@ -160,15 +158,17 @@ const validateExternalExpressionsVisitor = {
   },
   ThisExpression(path) {
     throw new Error(path.parentPath.getSource())
-  },
+  }
 }
 
-export const validateExternalExpressions = (path) => {
+export const validateExternalExpressions = path => {
   try {
     path.traverse(validateExternalExpressionsVisitor)
   } catch (error) {
     throw path.buildCodeFrameError(`
-      Found an \`undefined\` or invalid value in your styles: \`${error.message}\`.
+      Found an \`undefined\` or invalid value in your styles: \`${
+        error.message
+      }\`.
 
       If you are trying to use dynamic styles in external files this is unfortunately not possible yet.
       Please put the dynamic parts alongside the component. E.g.
@@ -194,7 +194,7 @@ export const getJSXStyleInfo = (expr, scope) => {
       css: node.value,
       expressions: [],
       dynamic: false,
-      location,
+      location
     }
   }
 
@@ -205,7 +205,7 @@ export const getJSXStyleInfo = (expr, scope) => {
       css: node.quasis[0].value.raw,
       expressions: [],
       dynamic: false,
-      location,
+      location
     }
   }
 
@@ -231,7 +231,10 @@ export const getJSXStyleInfo = (expr, scope) => {
       if (val.confident) {
         dynamic = false
       } else if (val.deopt) {
-        const computedObject = val.deopt.get('object').resolve().evaluate()
+        const computedObject = val.deopt
+          .get('object')
+          .resolve()
+          .evaluate()
         dynamic = !computedObject.confident
       }
     } catch (_) {}
@@ -249,7 +252,7 @@ export const getJSXStyleInfo = (expr, scope) => {
     css,
     expressions,
     dynamic,
-    location,
+    location
   }
 }
 
@@ -260,7 +263,7 @@ export const computeClassNames = (
 ) => {
   if (styles.length === 0) {
     return {
-      className: externalJsxId,
+      className: externalJsxId
     }
   }
 
@@ -276,7 +279,7 @@ export const computeClassNames = (
     },
     {
       static: [],
-      dynamic: [],
+      dynamic: []
     }
   )
 
@@ -289,7 +292,7 @@ export const computeClassNames = (
       staticClassName,
       className: externalJsxId
         ? concat(t.stringLiteral(staticClassName + ' '), externalJsxId)
-        : t.stringLiteral(staticClassName),
+        : t.stringLiteral(staticClassName)
     }
   }
 
@@ -303,13 +306,13 @@ export const computeClassNames = (
     // Arguments
     [
       t.arrayExpression(
-        hashes.dynamic.map((styles) =>
+        hashes.dynamic.map(styles =>
           t.arrayExpression([
             t.stringLiteral(hashString(styles.hash + staticClassName)),
-            t.arrayExpression(styles.expressions),
+            t.arrayExpression(styles.expressions)
           ])
         )
-      ),
+      )
     ]
   )
 
@@ -320,7 +323,7 @@ export const computeClassNames = (
       staticClassName,
       className: externalJsxId
         ? concat(concat(externalJsxId, t.stringLiteral(' ')), dynamic)
-        : dynamic,
+        : dynamic
     }
   }
 
@@ -333,7 +336,7 @@ export const computeClassNames = (
           concat(externalJsxId, t.stringLiteral(` ${staticClassName} `)),
           dynamic
         )
-      : concat(t.stringLiteral(`${staticClassName} `), dynamic),
+      : concat(t.stringLiteral(`${staticClassName} `), dynamic)
   }
 }
 
@@ -361,7 +364,7 @@ export const templateLiteralFromPreprocessedCss = (css, expressions) => {
       t.templateElement(
         {
           raw: quasi,
-          cooked: quasi,
+          cooked: quasi
         },
         quasis.length === index + 1
       )
@@ -370,7 +373,7 @@ export const templateLiteralFromPreprocessedCss = (css, expressions) => {
   )
 }
 
-export const cssToBabelType = (css) => {
+export const cssToBabelType = css => {
   if (typeof css === 'string') {
     return t.stringLiteral(css)
   }
@@ -396,7 +399,7 @@ export const makeStyledJsxTag = (
       t.jSXExpressionContainer(
         typeof id === 'string' ? t.stringLiteral(id) : id
       )
-    ),
+    )
   ]
 
   if (expressions.length > 0) {
@@ -415,11 +418,11 @@ export const makeStyledJsxTag = (
   )
 }
 
-export const makeSourceMapGenerator = (file) => {
+export const makeSourceMapGenerator = file => {
   const filename = file.sourceFileName
   const generator = new SourceMapGenerator({
     file: filename,
-    sourceRoot: file.sourceRoot,
+    sourceRoot: file.sourceRoot
   })
 
   generator.setSourceContent(filename, file.code)
@@ -429,7 +432,7 @@ export const makeSourceMapGenerator = (file) => {
 export const addSourceMaps = (code, generator, filename) => {
   const sourceMaps = [
     convert.fromObject(generator).toComment({ multiline: true }),
-    `/*@ sourceURL=${filename.replace(/\\/g, '\\\\')} */`,
+    `/*@ sourceURL=${filename.replace(/\\/g, '\\\\')} */`
   ]
 
   if (Array.isArray(code)) {
@@ -441,11 +444,11 @@ export const addSourceMaps = (code, generator, filename) => {
 
 const combinedPluginsCache = {
   plugins: null,
-  combined: null,
+  combined: null
 }
-export const combinePlugins = (plugins) => {
+export const combinePlugins = plugins => {
   if (!plugins) {
-    return (css) => css
+    return css => css
   }
 
   const pluginsToString = JSON.stringify(plugins)
@@ -456,7 +459,7 @@ export const combinePlugins = (plugins) => {
 
   if (
     !Array.isArray(plugins) ||
-    plugins.some((p) => !Array.isArray(p) && typeof p !== 'string')
+    plugins.some(p => !Array.isArray(p) && typeof p !== 'string')
   ) {
     throw new Error(
       '`plugins` must be an array of plugins names (string) or an array `[plugin-name, {options}]`'
@@ -488,20 +491,22 @@ export const combinePlugins = (plugins) => {
       const type = typeof p
       if (type !== 'function') {
         throw new Error(
-          `Expected plugin ${plugins[i]} to be a function but instead got ${type}`
+          `Expected plugin ${
+            plugins[i]
+          } to be a function but instead got ${type}`
         )
       }
 
       return {
         plugin: p,
-        options,
+        options
       }
     })
     .reduce(
       (previous, { plugin, options }) => (css, babelOptions) =>
         plugin(previous ? previous(css, babelOptions) : css, {
           ...options,
-          babel: babelOptions,
+          babel: babelOptions
         }),
       null
     )
@@ -523,13 +528,13 @@ export const processCss = (stylesInfo, options) => {
     isGlobal,
     plugins,
     vendorPrefixes,
-    sourceMaps,
+    sourceMaps
   } = stylesInfo
 
   const fileInfo = {
     code: file.code,
     sourceRoot: file.opts.sourceRoot,
-    filename: file.opts.filename || file.filename,
+    filename: file.opts.filename || file.filename
   }
 
   fileInfo.sourceFileName =
@@ -552,12 +557,12 @@ export const processCss = (stylesInfo, options) => {
   const pluginsOptions = {
     location: {
       start: { ...location.start },
-      end: { ...location.end },
+      end: { ...location.end }
     },
     vendorPrefixes,
     sourceMaps: useSourceMaps,
     isGlobal,
-    filename: fileInfo.filename,
+    filename: fileInfo.filename
   }
 
   let transformedCss
@@ -575,7 +580,7 @@ export const processCss = (stylesInfo, options) => {
           offset: location.start,
           filename,
           splitRules,
-          vendorPrefixes,
+          vendorPrefixes
         }
       ),
       generator,
@@ -596,12 +601,12 @@ export const processCss = (stylesInfo, options) => {
         expressions
       )
     } else {
-      transformedCss = transformedCss.map((transformedCss) =>
+      transformedCss = transformedCss.map(transformedCss =>
         templateLiteralFromPreprocessedCss(transformedCss, expressions)
       )
     }
   } else if (Array.isArray(transformedCss)) {
-    transformedCss = transformedCss.map((transformedCss) =>
+    transformedCss = transformedCss.map(transformedCss =>
       t.stringLiteral(transformedCss)
     )
   }
@@ -609,13 +614,13 @@ export const processCss = (stylesInfo, options) => {
   return {
     hash: dynamic ? hashString(hash + staticClassName) : hashString(hash),
     css: transformedCss,
-    expressions: dynamic && expressions,
+    expressions: dynamic && expressions
   }
 }
 
-export const booleanOption = (opts) => {
+export const booleanOption = opts => {
   let ret
-  opts.some((opt) => {
+  opts.some(opt => {
     if (typeof opt === 'boolean') {
       ret = opt
       return true
@@ -626,30 +631,30 @@ export const booleanOption = (opts) => {
   return ret
 }
 
-export const createReactComponentImportDeclaration = (state) => {
+export const createReactComponentImportDeclaration = state => {
   return t.importDeclaration(
     [t.importDefaultSpecifier(t.identifier(state.styleComponentImportName))],
     t.stringLiteral(state.styleModule)
   )
 }
 
-export const setStateOptions = (state) => {
+export const setStateOptions = state => {
   const vendorPrefixes = booleanOption([
     state.opts.vendorPrefixes,
-    state.file.opts.vendorPrefixes,
+    state.file.opts.vendorPrefixes
   ])
   state.opts.vendorPrefixes =
     typeof vendorPrefixes === 'boolean' ? vendorPrefixes : true
   const sourceMaps = booleanOption([
     state.opts.sourceMaps,
-    state.file.opts.sourceMaps,
+    state.file.opts.sourceMaps
   ])
   state.opts.sourceMaps = Boolean(sourceMaps)
 
   if (!state.plugins) {
     state.plugins = combinePlugins(state.opts.plugins, {
       sourceMaps: state.opts.sourceMaps,
-      vendorPrefixes: state.opts.vendorPrefixes,
+      vendorPrefixes: state.opts.vendorPrefixes
     })
   }
   state.styleModule =

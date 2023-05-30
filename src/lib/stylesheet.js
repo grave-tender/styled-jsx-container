@@ -7,7 +7,7 @@ const isProd =
   typeof process !== 'undefined' &&
   process.env &&
   process.env.NODE_ENV === 'production'
-const isString = (o) => Object.prototype.toString.call(o) === '[object String]'
+const isString = o => Object.prototype.toString.call(o) === '[object String]'
 
 export default class StyleSheet {
   constructor({ name = 'stylesheet', optimizeForSpeed = isProd } = {}) {
@@ -81,9 +81,9 @@ export default class StyleSheet {
 
         return index
       },
-      deleteRule: (index) => {
+      deleteRule: index => {
         this._serverSheet.cssRules[index] = null
-      },
+      }
     }
   }
 
@@ -199,7 +199,7 @@ export default class StyleSheet {
     this._injected = false
     this._rulesCount = 0
     if (typeof window !== 'undefined') {
-      this._tags.forEach((tag) => tag && tag.parentNode.removeChild(tag))
+      this._tags.forEach(tag => tag && tag.parentNode.removeChild(tag))
       this._tags = []
     } else {
       // simpler on server
@@ -215,7 +215,7 @@ export default class StyleSheet {
     return this._tags.reduce((rules, tag) => {
       if (tag) {
         rules = rules.concat(
-          Array.prototype.map.call(this.getSheetForTag(tag).cssRules, (rule) =>
+          Array.prototype.map.call(this.getSheetForTag(tag).cssRules, rule =>
             rule.cssText === this._deletedRulePlaceholder ? null : rule
           )
         )

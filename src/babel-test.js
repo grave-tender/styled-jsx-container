@@ -1,6 +1,6 @@
 import jsx from '@babel/plugin-syntax-jsx'
 
-export default function () {
+export default function() {
   return {
     inherits: jsx,
     visitor: {
@@ -12,11 +12,11 @@ export default function () {
           return
         }
 
-        el.attributes = el.attributes.filter((a) => {
+        el.attributes = el.attributes.filter(a => {
           const name = a.name.name
           return name !== 'jsx' && name !== 'global'
         })
-      },
-    },
+      }
+    }
   }
 }

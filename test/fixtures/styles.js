@@ -32,9 +32,7 @@ css.resolve`
   div {
     color: ${colors.green.light};
   }
-  a {
-    color: red;
-  }
+  a { color: red }
 `
 
 const b = resolve`
@@ -44,7 +42,7 @@ const b = resolve`
   a { color: red }
 `
 
-const dynamic = (colors) => {
+const dynamic = colors => {
   const b = resolve`
     div {
       color: ${colors.green.light};

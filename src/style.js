@@ -32,9 +32,9 @@ export default function JSXStyle(props) {
   return null
 }
 
-JSXStyle.dynamic = (info) => {
+JSXStyle.dynamic = info => {
   return info
-    .map((tagInfo) => {
+    .map(tagInfo => {
       const baseId = tagInfo[0]
       const props = tagInfo[1]
       return computeId(baseId, props)

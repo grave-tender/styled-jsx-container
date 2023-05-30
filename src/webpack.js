@@ -2,7 +2,7 @@ import loaderUtils from 'loader-utils'
 
 const types = ['scoped', 'global', 'resolve']
 
-export default function (content) {
+export default function(content) {
   if (this.cacheable) this.cacheable()
   this.addDependency(this.resourcePath)
   const options = Object.assign({}, loaderUtils.getOptions(this))
@@ -14,7 +14,7 @@ export default function (content) {
   // Calls type with the current file name.
   if (typeof options.type === 'function') {
     options.type = options.type(this.resourcePath, {
-      query: loaderUtils.parseQuery(this.resourceQuery || '?') || {},
+      query: loaderUtils.parseQuery(this.resourceQuery || '?') || {}
     })
   }
 
@@ -48,7 +48,7 @@ export default function (content) {
   // (c) https://github.com/coox/styled-jsx-css-loader/blob/97a38e90dddf2c4b066e9247db0612c8f95302de/index.js#L6
   output += `\`${content.replace(
     /[`\\]/g,
-    (match) => '\\' + match
+    match => '\\' + match
   )}\`;\n\nexport default styles;`
 
   this.callback(null, output)

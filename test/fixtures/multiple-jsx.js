@@ -1,5 +1,5 @@
 const attrs = {
-  id: 'test',
+  id: 'test'
 }
 
 const Test1 = () => (

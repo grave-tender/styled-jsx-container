@@ -1,5 +1,5 @@
 export default function withMock(mockFn, testFn) {
-  return (t) => {
+  return t => {
     const cleanUp = mockFn(t)
     if (typeof cleanUp !== 'function') {
       throw new TypeError('mockFn should return a cleanup function')
@@ -20,9 +20,9 @@ export function withMockDocument(t) {
         getAttribute(attr) {
           t.is(attr, 'content')
           return 'test-nonce'
-        },
+        }
       }
-    },
+    }
   }
 
   return () => {

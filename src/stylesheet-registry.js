@@ -4,7 +4,7 @@ import DefaultStyleSheet from './lib/stylesheet'
 import { computeId, computeSelector } from './lib/hash'
 
 function mapRulesToStyle(cssRules, options = {}) {
-  return cssRules.map((args) => {
+  return cssRules.map(args => {
     const id = args[0]
     const css = args[1]
     return React.createElement('style', {
@@ -13,8 +13,8 @@ function mapRulesToStyle(cssRules, options = {}) {
       key: `__${id}`,
       nonce: options.nonce ? options.nonce : undefined,
       dangerouslySetInnerHTML: {
-        __html: css,
-      },
+        __html: css
+      }
     })
   })
 }
@@ -24,7 +24,7 @@ export class StyleSheetRegistry {
       styleSheet ||
       new DefaultStyleSheet({
         name: 'styled-jsx',
-        optimizeForSpeed,
+        optimizeForSpeed
       })
 
     this._sheet.inject()
@@ -65,9 +65,9 @@ export class StyleSheetRegistry {
     }
 
     const indices = rules
-      .map((rule) => this._sheet.insertRule(rule))
+      .map(rule => this._sheet.insertRule(rule))
       // Filter out invalid rules
-      .filter((index) => index !== -1)
+      .filter(index => index !== -1)
 
     this._indices[styleId] = indices
     this._instancesCounts[styleId] = 1
@@ -87,7 +87,7 @@ export class StyleSheetRegistry {
         tagFromServer.parentNode.removeChild(tagFromServer)
         delete this._fromServer[styleId]
       } else {
-        this._indices[styleId].forEach((index) => this._sheet.deleteRule(index))
+        this._indices[styleId].forEach(index => this._sheet.deleteRule(index))
         delete this._indices[styleId]
       }
 
@@ -110,23 +110,23 @@ export class StyleSheetRegistry {
 
   cssRules() {
     const fromServer = this._fromServer
-      ? Object.keys(this._fromServer).map((styleId) => [
+      ? Object.keys(this._fromServer).map(styleId => [
           styleId,
-          this._fromServer[styleId],
+          this._fromServer[styleId]
         ])
       : []
     const cssRules = this._sheet.cssRules()
 
     return fromServer.concat(
       Object.keys(this._indices)
-        .map((styleId) => [
+        .map(styleId => [
           styleId,
           this._indices[styleId]
-            .map((index) => cssRules[index].cssText)
-            .join(this._optimizeForSpeed ? '' : '\n'),
+            .map(index => cssRules[index].cssText)
+            .join(this._optimizeForSpeed ? '' : '\n')
         ])
         // filter out empty rules
-        .filter((rule) => Boolean(rule[1]))
+        .filter(rule => Boolean(rule[1]))
     )
   }
 
@@ -142,14 +142,14 @@ export class StyleSheetRegistry {
       return {
         styleId,
         rules: Array.isArray(css)
-          ? css.map((rule) => computeSelector(styleId, rule))
-          : [computeSelector(styleId, css)],
+          ? css.map(rule => computeSelector(styleId, rule))
+          : [computeSelector(styleId, css)]
       }
     }
 
     return {
       styleId: computeId(id),
-      rules: Array.isArray(css) ? css : [css],
+      rules: Array.isArray(css) ? css : [css]
     }
   }
 

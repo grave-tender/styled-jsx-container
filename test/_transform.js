@@ -7,7 +7,7 @@ export default (file, opts = {}) =>
       path.resolve(__dirname, file),
       {
         babelrc: false,
-        ...opts,
+        ...opts
       },
       (error, data) => {
         if (error) {
@@ -25,7 +25,7 @@ export const transformSource = (src, opts = {}) =>
       src,
       {
         babelrc: false,
-        ...opts,
+        ...opts
       },
       (error, result) => {
         if (error) {

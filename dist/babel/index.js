@@ -21566,7 +21566,6 @@ var stylis$1 = { exports: {} }
       var VERTICALTAB = 11 /* \v */
       /* special identifiers */ var KEYFRAME = 107 /* k */
       var MEDIA = 109 /* m */
-      var CONTAINER = 99 /* c */
       var SUPPORTS = 115 /* s */
       var PLACEHOLDER = 112 /* p */
       var READONLY = 111 /* o */
@@ -21788,23 +21787,11 @@ var stylis$1 = { exports: {} }
                   case AT: {
                     if (format > 0) {
                       chars = chars.replace(formatptn, '')
-                    } //h = 104, o = 111
-                    //ooh here we use charCodeAt at the position 1 cuz position 0 is the @
-                    /**
-                     * if the first character is same as CHARSET aka 99
-                     * and if the third character is 110 aka 'n'
-                     * then
-                     * second will become MEDIA, aka 109 'm'
-                     * otherwise second will become whatever was the first character
-                     */ var third = chars.charCodeAt(2)
-                    second =
-                      chars.charCodeAt(1) === CHARSET && third === 104
-                        ? MEDIA
-                        : chars.charCodeAt(1)
+                    }
+                    second = chars.charCodeAt(1)
                     switch (second) {
                       case DOCUMENT:
                       case MEDIA:
-                      case CONTAINER:
                       case SUPPORTS:
                       case DASH: {
                         selector = current
@@ -21850,7 +21837,6 @@ var stylis$1 = { exports: {} }
                         }
                         case DOCUMENT:
                         case MEDIA:
-                        case CONTAINER:
                         case DASH: {
                           child = chars + '{' + child + '}'
                           break
@@ -21945,18 +21931,12 @@ var stylis$1 = { exports: {} }
                   }
                   first = chars.charCodeAt(0)
                   second = chars.charCodeAt(1)
-                  var third1 = chars.charCodeAt(2)
                   switch (first) {
                     case NULL: {
                       break
                     }
                     case AT: {
-                      //here checking if the at rule is different from container by checking if the third character in the at rule is different from 111 aka 'o'
-                      //we want to avoid confusing charset and container and must behave differently
-                      if (
-                        (second === IMPORT || second === CHARSET) &&
-                        third1 !== 111
-                      ) {
+                      if (second === IMPORT || second === CHARSET) {
                         flat += chars + body.charAt(caret)
                         break
                       }
@@ -22349,7 +22329,7 @@ var stylis$1 = { exports: {} }
             (current[0].length === 0) === false
           ) {
             if (
-              (id !== MEDIA && id !== CONTAINER) ||
+              id !== MEDIA ||
               (current.length === 1 &&
                 (cascade > 0 ? nscopealt : nscope) === current[0])
             ) {
@@ -22929,22 +22909,36 @@ var stylisRuleSheet$1 = { exports: {} }
 var stylisRuleSheet = stylisRuleSheet$1.exports
 
 var stylis = new Stylis()
-/*
-function disableNestingPlugin(...args) {
-  let [context, , , parent = [], line, column] = args
+function disableNestingPlugin() {
+  for (
+    var _len = arguments.length, args = new Array(_len), _key = 0;
+    _key < _len;
+    _key++
+  ) {
+    args[_key] = arguments[_key]
+  }
+  var context = args[0],
+    tmp = args[3],
+    parent = tmp === void 0 ? [] : tmp,
+    line = args[4],
+    column = args[5]
   if (context === 2) {
     // replace null characters and trim
     // eslint-disable-next-line no-control-regex
     parent = (parent[0] || '').replace(/\u0000/g, '').trim()
     if (parent.length > 0 && parent.charAt(0) !== '@') {
       throw new Error(
-        `Nesting detected at ${line}:${column}. ` +
-          'Unfortunately nesting is not supported by styled-jsx-container.'
+        'Nesting detected at ' +
+          line +
+          ':' +
+          column +
+          '. ' +
+          'Unfortunately nesting is not supported by styled-jsx.'
       )
     }
   }
 }
-*/ var generator
+var generator
 var filename
 var offset
 function sourceMapsPlugin() {
@@ -23001,7 +22995,7 @@ function sourceMapsPlugin() {
 var splitRulesPlugin = stylisRuleSheet(function (rule) {
   splitRules.push(rule)
 })
-// stylis.use(disableNestingPlugin)
+stylis.use(disableNestingPlugin)
 stylis.use(sourceMapsPlugin)
 stylis.use(splitRulesPlugin)
 stylis.set({

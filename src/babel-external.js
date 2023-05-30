@@ -8,7 +8,7 @@ import {
   getScope,
   computeClassNames,
   makeStyledJsxTag,
-  setStateOptions,
+  setStateOptions
 } from './_utils'
 
 const isModuleExports = t.buildMatchMemberExpression('module.exports')
@@ -21,7 +21,7 @@ export function processTaggedTemplateExpression({
   plugins,
   vendorPrefixes,
   sourceMaps,
-  styleComponentImportName,
+  styleComponentImportName
 }) {
   const templateLiteral = path.get('quasi')
   let scope
@@ -51,7 +51,7 @@ export function processTaggedTemplateExpression({
       isGlobal: type === 'global',
       plugins,
       vendorPrefixes,
-      sourceMaps,
+      sourceMaps
     },
     { splitRules }
   )
@@ -68,7 +68,7 @@ export function processTaggedTemplateExpression({
           t.identifier('styles'),
           makeStyledJsxTag(hash, css, expressions, styleComponentImportName)
         ),
-        t.objectProperty(t.identifier('className'), className),
+        t.objectProperty(t.identifier('className'), className)
       ])
     )
     return
@@ -80,7 +80,7 @@ export function processTaggedTemplateExpression({
     baseExportName === 'default'
       ? path.parentPath
       : path.findParent(
-          (path) =>
+          path =>
             path.isVariableDeclaration() ||
             (path.isAssignmentExpression() &&
               isModuleExports(path.get('left').node))
@@ -103,7 +103,7 @@ export function processTaggedTemplateExpression({
     )
     parentPath.insertBefore(
       t.variableDeclaration('const', [
-        t.variableDeclarator(defaultExportIdentifier, newPath),
+        t.variableDeclarator(defaultExportIdentifier, newPath)
       ])
     )
 
@@ -140,9 +140,9 @@ export const visitor = {
     // e.g import css, { global, resolve } from 'styled-jsx/css'
     // -> ['css', 'global', 'resolve']
     const specifiersNames = path.node.specifiers.map(
-      (specifier) => specifier.local.name
+      specifier => specifier.local.name
     )
-    specifiersNames.forEach((tagName) => {
+    specifiersNames.forEach(tagName => {
       // Get all the reference paths i.e. the places that use the tagName above
       // eg.
       // css`div { color: red }`
@@ -157,7 +157,7 @@ export const visitor = {
       // Produces an object containing all the TaggedTemplateExpression paths detected.
       // The object contains { scoped, global, resolve }
       const taggedTemplateExpressions = binding.referencePaths
-        .map((ref) => ref.parentPath)
+        .map(ref => ref.parentPath)
         .reduce(
           (result, path) => {
             let taggedTemplateExpression
@@ -192,7 +192,7 @@ export const visitor = {
           {
             scoped: [],
             global: [],
-            resolve: [],
+            resolve: []
           }
         )
 
@@ -200,8 +200,8 @@ export const visitor = {
 
       const { vendorPrefixes, sourceMaps } = state.opts
 
-      Object.keys(taggedTemplateExpressions).forEach((type) =>
-        taggedTemplateExpressions[type].forEach((path) => {
+      Object.keys(taggedTemplateExpressions).forEach(type =>
+        taggedTemplateExpressions[type].forEach(path => {
           hasJSXStyle = true
           // Process each css block
           processTaggedTemplateExpression({
@@ -215,7 +215,7 @@ export const visitor = {
             plugins: state.plugins,
             vendorPrefixes,
             sourceMaps,
-            styleComponentImportName: state.styleComponentImportName,
+            styleComponentImportName: state.styleComponentImportName
           })
         })
       )
@@ -232,14 +232,14 @@ export const visitor = {
 
     // Finally remove the import
     path.remove()
-  },
+  }
 }
 
-export default function () {
+export default function() {
   return {
     Program(path, state) {
       setStateOptions(state)
     },
-    ...visitor,
+    ...visitor
   }
 }

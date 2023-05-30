@@ -10,7 +10,7 @@ import { computeId, computeSelector } from '../src/lib/hash'
 function makeRegistry(options = { optimizeForSpeed: true }) {
   const registry = new StyleSheetRegistry({
     styleSheet: makeSheet(options),
-    ...options,
+    ...options
   })
   registry.selectFromServer = () => ({})
   return registry
@@ -23,15 +23,15 @@ const cssRuleAlt = 'p { color: red }'
 
 test(
   'add',
-  withMock(withMockDocument, (t) => {
+  withMock(withMockDocument, t => {
     const options = [
       { optimizeForSpeed: true, isBrowser: true },
       { optimizeForSpeed: false, isBrowser: true },
       { optimizeForSpeed: true, isBrowser: false },
-      { optimizeForSpeed: false, isBrowser: false },
+      { optimizeForSpeed: false, isBrowser: false }
     ]
 
-    options.forEach((options) => {
+    options.forEach(options => {
       if (options.isBrowser) {
         globalThis.window = globalThis
       }
@@ -40,7 +40,7 @@ test(
 
       registry.add({
         id: '123',
-        children: options.optimizeForSpeed ? [cssRule] : cssRule,
+        children: options.optimizeForSpeed ? [cssRule] : cssRule
       })
 
       t.deepEqual(registry.cssRules(), [['jsx-123', cssRule]])
@@ -49,19 +49,19 @@ test(
 
       registry.add({
         id: '123',
-        children: options.optimizeForSpeed ? [cssRule] : cssRule,
+        children: options.optimizeForSpeed ? [cssRule] : cssRule
       })
 
       t.deepEqual(registry.cssRules(), [['jsx-123', cssRule]])
 
       registry.add({
         id: '345',
-        children: options.optimizeForSpeed ? [cssRule] : cssRule,
+        children: options.optimizeForSpeed ? [cssRule] : cssRule
       })
 
       t.deepEqual(registry.cssRules(), [
         ['jsx-123', cssRule],
-        ['jsx-345', cssRule],
+        ['jsx-345', cssRule]
       ])
 
       if (options.optimizeForSpeed) {
@@ -70,7 +70,7 @@ test(
         t.deepEqual(registry.cssRules(), [
           ['jsx-123', cssRule],
           ['jsx-345', cssRule],
-          ['jsx-456', 'div { color: red }p { color: red }'],
+          ['jsx-456', 'div { color: red }p { color: red }']
         ])
       }
 
@@ -83,7 +83,7 @@ test(
 
 test(
   'add - filters out invalid rules (index `-1`)',
-  withMock(withMockDocument, (t) => {
+  withMock(withMockDocument, t => {
     globalThis.window = globalThis
 
     const registry = makeRegistry()
@@ -99,7 +99,7 @@ test(
 
     t.deepEqual(registry.cssRules(), [
       ['jsx-123', 'div { color: red }'],
-      ['jsx-678', 'div { color: red }'],
+      ['jsx-678', 'div { color: red }']
     ])
 
     delete globalThis.window
@@ -108,7 +108,7 @@ test(
 
 test(
   'it does not throw when inserting an invalid rule',
-  withMock(withMockDocument, (t) => {
+  withMock(withMockDocument, t => {
     globalThis.window = globalThis
 
     const registry = makeRegistry()
@@ -127,26 +127,26 @@ test(
   })
 )
 
-test('add - sanitizes dynamic CSS on the server', (t) => {
+test('add - sanitizes dynamic CSS on the server', t => {
   const registry = makeRegistry({ optimizeForSpeed: false })
 
   registry.add({
     id: '123',
     children: [
-      'div.__jsx-style-dynamic-selector { color: red</style><script>alert("howdy")</script> }',
+      'div.__jsx-style-dynamic-selector { color: red</style><script>alert("howdy")</script> }'
     ],
-    dynamic: ['red</style><script>alert("howdy")</script>'],
+    dynamic: ['red</style><script>alert("howdy")</script>']
   })
 
   t.deepEqual(registry.cssRules(), [
     [
       'jsx-1871671996',
-      'div.jsx-1871671996 { color: red<\\/style><script>alert("howdy")</script> }',
-    ],
+      'div.jsx-1871671996 { color: red<\\/style><script>alert("howdy")</script> }'
+    ]
   ])
 })
 
-test('add - nonce is properly fetched from meta tag', (t) => {
+test('add - nonce is properly fetched from meta tag', t => {
   const originalDocument = globalThis.document
   // We need to stub a document in order to simulate the meta tag
   globalThis.document = {
@@ -156,9 +156,9 @@ test('add - nonce is properly fetched from meta tag', (t) => {
         getAttribute(attr) {
           t.is(attr, 'content')
           return 'test-nonce'
-        },
+        }
       }
-    },
+    }
   }
 
   globalThis.window = globalThis
@@ -177,15 +177,15 @@ test('add - nonce is properly fetched from meta tag', (t) => {
 
 test(
   'remove',
-  withMock(withMockDocument, (t) => {
+  withMock(withMockDocument, t => {
     const options = [
       { optimizeForSpeed: true, isBrowser: true },
       { optimizeForSpeed: false, isBrowser: true },
       { optimizeForSpeed: true, isBrowser: false },
-      { optimizeForSpeed: false, isBrowser: false },
+      { optimizeForSpeed: false, isBrowser: false }
     ]
 
-    options.forEach((options) => {
+    options.forEach(options => {
       if (options.isBrowser) {
         globalThis.window = globalThis
       }
@@ -193,12 +193,12 @@ test(
       const registry = makeRegistry(options)
       registry.add({
         id: '123',
-        children: options.optimizeForSpeed ? [cssRule] : cssRule,
+        children: options.optimizeForSpeed ? [cssRule] : cssRule
       })
 
       registry.add({
         id: '345',
-        children: options.optimizeForSpeed ? [cssRuleAlt] : cssRuleAlt,
+        children: options.optimizeForSpeed ? [cssRuleAlt] : cssRuleAlt
       })
 
       registry.remove({ id: '123' })
@@ -207,7 +207,7 @@ test(
       // Add a duplicate
       registry.add({
         id: '345',
-        children: options.optimizeForSpeed ? [cssRuleAlt] : cssRuleAlt,
+        children: options.optimizeForSpeed ? [cssRuleAlt] : cssRuleAlt
       })
       // and remove it
       registry.remove({ id: '345' })
@@ -229,15 +229,15 @@ test(
 
 test(
   'update',
-  withMock(withMockDocument, (t) => {
+  withMock(withMockDocument, t => {
     const options = [
       { optimizeForSpeed: true, isBrowser: true },
       { optimizeForSpeed: false, isBrowser: true },
       { optimizeForSpeed: true, isBrowser: false },
-      { optimizeForSpeed: false, isBrowser: false },
+      { optimizeForSpeed: false, isBrowser: false }
     ]
 
-    options.forEach((options) => {
+    options.forEach(options => {
       if (options.isBrowser) {
         globalThis.window = globalThis
       }
@@ -245,25 +245,25 @@ test(
       const registry = makeRegistry(options)
       registry.add({
         id: '123',
-        children: options.optimizeForSpeed ? [cssRule] : cssRule,
+        children: options.optimizeForSpeed ? [cssRule] : cssRule
       })
 
       registry.add({
         id: '123',
-        children: options.optimizeForSpeed ? [cssRule] : cssRule,
+        children: options.optimizeForSpeed ? [cssRule] : cssRule
       })
 
       registry.update(
         { id: '123' },
         {
           id: '345',
-          children: options.optimizeForSpeed ? [cssRuleAlt] : cssRuleAlt,
+          children: options.optimizeForSpeed ? [cssRuleAlt] : cssRuleAlt
         }
       )
       // Doesn't remove when there are multiple instances of 123
       t.deepEqual(registry.cssRules(), [
         ['jsx-123', cssRule],
-        ['jsx-345', cssRuleAlt],
+        ['jsx-345', cssRuleAlt]
       ])
 
       registry.remove({ id: '345' })
@@ -274,7 +274,7 @@ test(
         { id: '123' },
         {
           id: '345',
-          children: options.optimizeForSpeed ? [cssRuleAlt] : cssRuleAlt,
+          children: options.optimizeForSpeed ? [cssRuleAlt] : cssRuleAlt
         }
       )
       // 123 replaced with 345
@@ -291,7 +291,7 @@ test(
 
 test(
   'createComputeId',
-  withMock(withMockDocument, (t) => {
+  withMock(withMockDocument, t => {
     // without props
     t.is(computeId('123'), 'jsx-123')
 
@@ -304,7 +304,7 @@ test(
 
 test(
   'createComputeSelector',
-  withMock(withMockDocument, (t) => {
+  withMock(withMockDocument, t => {
     t.is(
       computeSelector(
         'jsx-123',
@@ -319,17 +319,17 @@ test(
 
 test(
   'getIdAndRules',
-  withMock(withMockDocument, (t) => {
+  withMock(withMockDocument, t => {
     const utilRegistry = makeRegistry()
     // simple
     t.deepEqual(
       utilRegistry.getIdAndRules({
         id: '123',
-        children: '.test {} .jsx-123 { color: red } .jsx-123 { color: red }',
+        children: '.test {} .jsx-123 { color: red } .jsx-123 { color: red }'
       }),
       {
         styleId: 'jsx-123',
-        rules: ['.test {} .jsx-123 { color: red } .jsx-123 { color: red }'],
+        rules: ['.test {} .jsx-123 { color: red } .jsx-123 { color: red }']
       }
     )
 
@@ -339,13 +339,13 @@ test(
         id: '123',
         children:
           '.test {} .__jsx-style-dynamic-selector { color: red } .__jsx-style-dynamic-selector { color: red }',
-        dynamic: ['test', 3, 'test'],
+        dynamic: ['test', 3, 'test']
       }),
       {
         styleId: 'jsx-1172888331',
         rules: [
-          '.test {} .jsx-1172888331 { color: red } .jsx-1172888331 { color: red }',
-        ],
+          '.test {} .jsx-1172888331 { color: red } .jsx-1172888331 { color: red }'
+        ]
       }
     )
 
@@ -356,17 +356,17 @@ test(
         children: [
           '.test {}',
           '.__jsx-style-dynamic-selector { color: red }',
-          '.__jsx-style-dynamic-selector { color: red }',
+          '.__jsx-style-dynamic-selector { color: red }'
         ],
-        dynamic: ['test', 3, 'test'],
+        dynamic: ['test', 3, 'test']
       }),
       {
         styleId: 'jsx-1172888331',
         rules: [
           '.test {}',
           '.jsx-1172888331 { color: red }',
-          '.jsx-1172888331 { color: red }',
-        ],
+          '.jsx-1172888331 { color: red }'
+        ]
       }
     )
   })

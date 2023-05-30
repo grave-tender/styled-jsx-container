@@ -1,1 +1,1 @@
-export default (css) => `TEST (${css}) EOTEST`
+export default css => `TEST (${css}) EOTEST`
