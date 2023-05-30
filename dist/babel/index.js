@@ -4128,40 +4128,6 @@ var builder$1 = {};
 
 var definitions = {};
 
-function _type_of$4(obj) {
-    "@swc/helpers - typeof";
-    return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
-}
-var toFastProperties;
-var hasRequiredToFastProperties;
-function requireToFastProperties() {
-    if (hasRequiredToFastProperties) return toFastProperties;
-    hasRequiredToFastProperties = 1;
-    var fastProto = null;
-    // Creates an object with permanently fast properties in V8. See Toon Verwaest's
-    // post https://medium.com/@tverwaes/setting-up-prototypes-in-v8-ec9c9491dfe2#5f62
-    // for more details. Use %HasFastProperties(object) and the Node.js flag
-    // --allow-natives-syntax to check whether an object has fast properties.
-    function FastObject(o) {
-        // A prototype object will have "fast properties" enabled once it is checked
-        // against the inline property cache of a function, e.g. fastProto.property:
-        // https://github.com/v8/v8/blob/6.0.122/test/mjsunit/fast-prototype.js#L48-L63
-        if (fastProto !== null && _type_of$4(fastProto.property)) {
-            var result = fastProto;
-            fastProto = FastObject.prototype = null;
-            return result;
-        }
-        fastProto = FastObject.prototype = o == null ? Object.create(null) : o;
-        return new FastObject;
-    }
-    // Initialize the inline property cache of FastObject
-    FastObject();
-    toFastProperties = function toFastproperties(o) {
-        return FastObject(o);
-    };
-    return toFastProperties;
-}
-
 var core = {};
 
 var is = {};
@@ -10512,7 +10478,6 @@ function requireDefinitions() {
             }
         });
         exports.TYPES = void 0;
-        var _toFastProperties = requireToFastProperties();
         requireCore();
         requireFlow();
         requireJsx();
@@ -10521,14 +10486,6 @@ function requireDefinitions() {
         requireTypescript();
         var _utils = requireUtils();
         var _placeholders = requirePlaceholders();
-        _toFastProperties(_utils.VISITOR_KEYS);
-        _toFastProperties(_utils.ALIAS_KEYS);
-        _toFastProperties(_utils.FLIPPED_ALIAS_KEYS);
-        _toFastProperties(_utils.NODE_FIELDS);
-        _toFastProperties(_utils.BUILDER_KEYS);
-        _toFastProperties(_utils.DEPRECATED_KEYS);
-        _toFastProperties(_placeholders.PLACEHOLDERS_ALIAS);
-        _toFastProperties(_placeholders.PLACEHOLDERS_FLIPPED_ALIAS);
         var TYPES = Object.keys(_utils.VISITOR_KEYS).concat(Object.keys(_utils.FLIPPED_ALIAS_KEYS)).concat(Object.keys(_utils.DEPRECATED_KEYS));
         exports.TYPES = TYPES;
     })(definitions);
@@ -22485,7 +22442,109 @@ var visitor = {
     }
 };
 
-// Packages
+function babelMacro(param) {
+    var createMacro = param.createMacro, MacroError = param.MacroError;
+    var styledJsxMacro = function styledJsxMacro(param) {
+        var references = param.references, state = param.state;
+        setStateOptions(state);
+        // Holds a reference to all the lines where strings are tagged using the `css` tag name.
+        // We print a warning at the end of the macro in case there is any reference to css,
+        // because `css` is generally used as default import name for 'styled-jsx/css'.
+        // People who want to migrate from this macro to pure styled-jsx might have name conflicts issues.
+        var cssReferences = [];
+        // references looks like this
+        // {
+        //    default: [path, path],
+        //    resolve: [path],
+        // }
+        Object.keys(references).forEach(function(refName) {
+            // Enforce `resolve` as named import so people
+            // can only import { resolve } from 'styled-jsx/macro'
+            // or an alias of it eg. { resolve as foo }
+            if (refName !== "default" && refName !== "resolve") {
+                throw new MacroError("Imported an invalid named import: " + refName + ". Please import: resolve");
+            }
+            // Start processing the references for refName
+            references[refName].forEach(function(path) {
+                // We grab the parent path. Eg.
+                // path -> css
+                // path.parenPath -> css`div { color: red }`
+                var templateExpression = path.parentPath;
+                // templateExpression member expression?
+                // path -> css
+                // path.parentPath -> css.resolve
+                if (templateExpression.isMemberExpression()) {
+                    // grab .resolve
+                    var tagPropertyName = templateExpression.get("property").node.name;
+                    // Member expressions are only valid on default imports
+                    // eg. import css from 'styled-jsx/macro'
+                    if (refName !== "default") {
+                        throw new MacroError("Can't use named import " + path.node.name + " as a member expression: " + path.node.name + "." + tagPropertyName + "`div { color: red }` Please use it directly: " + path.node.name + "`div { color: red }`");
+                    }
+                    // Otherwise enforce `css.resolve`
+                    if (tagPropertyName !== "resolve") {
+                        throw new MacroError("Using an invalid tag: " + tagPropertyName + ". Please use " + templateExpression.get("object").node.name + ".resolve");
+                    }
+                    // Grab the TaggedTemplateExpression
+                    // i.e. css.resolve`div { color: red }`
+                    templateExpression = templateExpression.parentPath;
+                } else {
+                    if (refName === "default") {
+                        var name = path.node.name;
+                        throw new MacroError("Can't use default import directly eg. " + name + "`div { color: red }`. Please use " + name + ".resolve`div { color: red }` instead.");
+                    }
+                    if (path.node.name === "css") {
+                        // If the path node name is `css` we push it to the references above to emit a warning later.
+                        cssReferences.push(path.node.loc.start.line);
+                    }
+                }
+                if (!state.styleComponentImportName) {
+                    var programPath = path.findParent(function(p) {
+                        return p.isProgram();
+                    });
+                    state.styleComponentImportName = programPath.scope.generateUidIdentifier(STYLE_COMPONENT).name;
+                    var importDeclaration = createReactComponentImportDeclaration(state);
+                    programPath.unshiftContainer("body", importDeclaration);
+                }
+                // Finally transform the path :)
+                processTaggedTemplateExpression({
+                    type: "resolve",
+                    path: templateExpression,
+                    file: state.file,
+                    splitRules: typeof state.opts.optimizeForSpeed === "boolean" ? state.opts.optimizeForSpeed : process.env.NODE_ENV === "production",
+                    plugins: state.plugins,
+                    vendorPrefixes: state.opts.vendorPrefixes,
+                    sourceMaps: state.opts.sourceMaps,
+                    styleComponentImportName: state.styleComponentImportName
+                });
+            });
+        });
+        if (cssReferences.length > 0) {
+            console.warn("styled-jsx - Warning - We detected that you named your tag as `css` at lines: " + cssReferences.join(", ") + ".\n" + "This tag name is usually used as default import name for `styled-jsx/css`.\n" + "Porting macro code to pure styled-jsx in the future might be a bit problematic.");
+        }
+    };
+    return createMacro(styledJsxMacro);
+}
+
+function babelTest() {
+    return {
+        inherits: default_1,
+        visitor: {
+            JSXOpeningElement: function JSXOpeningElement(path) {
+                var el = path.node;
+                var name = (el.name || {}).name;
+                if (name !== "style") {
+                    return;
+                }
+                el.attributes = el.attributes.filter(function(a) {
+                    var name = a.name.name;
+                    return name !== "jsx" && name !== "global";
+                });
+            }
+        }
+    };
+}
+
 function _array_like_to_array(arr, len) {
     if (len == null || len > arr.length) len = arr.length;
     for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
@@ -22546,10 +22605,10 @@ function _create_for_of_iterator_helper_loose(o, allowArrayLike) {
     throw new TypeError("Invalid attempt to iterate non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 function macro() {
-    return require("./macro");
+    return babelMacro(require("babel-plugin-macros"));
 }
 function test() {
-    return require("./babel-test");
+    return babelTest;
 }
 function babel(param) {
     var t = param.types;

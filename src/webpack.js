@@ -1,8 +1,8 @@
-const loaderUtils = require('loader-utils').default
+import loaderUtils from 'loader-utils'
 
 const types = ['scoped', 'global', 'resolve']
 
-module.exports = function(content) {
+export default function(content) {
   if (this.cacheable) this.cacheable()
   this.addDependency(this.resourcePath)
   const options = Object.assign({}, loaderUtils.getOptions(this))
@@ -45,7 +45,7 @@ module.exports = function(content) {
   // default css``
 
   // Escape backticks and backslashes: “`” ⇒ “\`”, “\” ⇒ “\\”
-  // (c) https://git.io/fNZzr
+  // (c) https://github.com/coox/styled-jsx-css-loader/blob/97a38e90dddf2c4b066e9247db0612c8f95302de/index.js#L6
   output += `\`${content.replace(
     /[`\\]/g,
     match => '\\' + match

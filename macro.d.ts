@@ -1,4 +1,4 @@
-declare module 'styled-jsx-container/macro' {
+declare module 'styled-jsx/macro' {
   namespace macro {
     function resolve(
       chunks: TemplateStringsArray,

@@ -1,3 +1,3 @@
-declare module 'styled-jsx-container/style' {
+declare module 'styled-jsx/style' {
   export default function JSXStyle(props: any): null
 }
