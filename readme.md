@@ -1,6 +1,10 @@
 # styled-jsx-container
 
-This is a copy of [styled-jsx](https://github.com/vercel/styled-jsx) version 5.1.1 used by Nextjs@13.3.1 modified to support container queries. They are set to behave the same way media queries do. This is meant as a package to override the default dependency of Nextjs.## Getting started
+!!! 0.1.x versions won't work, still figuring out why, will update to 1.0.0 once it's fully functionning. Actively working on it.
+
+This is a copy of [styled-jsx](https://github.com/vercel/styled-jsx) version 5.1.1 used by Nextjs@13.3.1 modified to support container queries. They are set to behave the same way media queries do. This is meant as a package to override the default dependency of Nextjs.
+
+## Getting started
 
 Firstly, install the package:
 
