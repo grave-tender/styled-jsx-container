@@ -1,6 +1,6 @@
 {
   "name": "styled-jsx-container",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "license": "MIT",
   "repository": "grave-tender/styled-jsx-container",
   "description": "A copy of styled-jsx@5.1.1 work where we manually added support for the new container queries.",
@@ -23,13 +23,13 @@
   ],
   "typings": "./index.d.ts",
   "scripts": {
-    "build-babel": "bunchee ./babel.js -f cjs -e babel-plugin-macros --runtime node -o dist/babel/index.js",
+    "build-babel": "bunchee src/babel.js -f cjs -e babel-plugin-macros --runtime node -o dist/babel/index.js",
     "build": "rm -rf dist && rm -rf out && yarn build-webpack && yarn build-index && yarn build-babel",
-    "build-webpack": "bunchee ./webpack.js -f cjs --runtime node -o dist/webpack/index.js",
-    "build-index": "bunchee ./index.js -f cjs --runtime node -o dist/index/index.js",
+    "build-webpack": "bunchee src/webpack.js -f cjs --runtime node -o dist/webpack/index.js",
+    "build-index": "bunchee src/index.js -f cjs --runtime node -o dist/index/index.js",
     "test": "ava",
-    "lint": "eslint ./",
-    "format": "prettier --write \"./{test}/**/*.{js,css}\"",
+    "lint": "eslint ./src",
+    "format": "prettier --write \"./{src,test}/**/*.{js,css}\"",
     "prepublishOnly": "yarn build && yarn lint --quiet"
   },
   "husky": {
