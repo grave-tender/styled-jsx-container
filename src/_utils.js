@@ -531,6 +531,11 @@ export const processCss = (stylesInfo, options) => {
     sourceMaps
   } = stylesInfo
 
+  console.log('@@@');
+  console.log(plugins);
+  console.log('###');
+  console.log(stylesInfo);
+
   const fileInfo = {
     code: file.code,
     sourceRoot: file.opts.sourceRoot,
