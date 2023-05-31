@@ -305,7 +305,7 @@ var StyleSheetRegistry = /*#__PURE__*/ function() {
     function StyleSheetRegistry(param) {
         var _ref = param === void 0 ? {} : param, _ref_styleSheet = _ref.styleSheet, styleSheet = _ref_styleSheet === void 0 ? null : _ref_styleSheet, _ref_optimizeForSpeed = _ref.optimizeForSpeed, optimizeForSpeed = _ref_optimizeForSpeed === void 0 ? false : _ref_optimizeForSpeed;
         this._sheet = styleSheet || new StyleSheet({
-            name: "styled-jsx",
+            name: "styled-jsx-container",
             optimizeForSpeed: optimizeForSpeed
         });
         this._sheet.inject();

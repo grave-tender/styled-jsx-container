@@ -1,4 +1,4 @@
-declare module 'styled-jsx' {
+declare module 'styled-jsx-container' {
   export type StyledJsxStyleRegistry = {
     styles(options?: { nonce?: string }): JSX.Element[]
     flush(): void

@@ -214,7 +214,7 @@ export default function({ types: t }) {
           throw path.buildCodeFrameError(
             'Detected nested style tag' +
               (styleTagSrc ? `: \n\n${styleTagSrc}\n\n` : ' ') +
-              'styled-jsx only allows style tags ' +
+              'styled-jsx-container only allows style tags ' +
               'to be direct descendants (children) of the outermost ' +
               'JSX element i.e. the subtree root.'
           )

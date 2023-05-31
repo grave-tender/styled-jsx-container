@@ -475,7 +475,7 @@ export const combinePlugins = plugins => {
         plugin = plugin[0]
         if (Object.prototype.hasOwnProperty.call(options, 'babel')) {
           throw new Error(`
-            Error while trying to register the styled-jsx plugin: ${plugin}
+            Error while trying to register the styled-jsx-container plugin: ${plugin}
             The option name \`babel\` is reserved.
           `)
         }
@@ -530,11 +530,6 @@ export const processCss = (stylesInfo, options) => {
     vendorPrefixes,
     sourceMaps
   } = stylesInfo
-
-  console.log('@@@');
-  console.log(plugins);
-  console.log('###');
-  console.log(stylesInfo);
 
   const fileInfo = {
     code: file.code,
@@ -665,9 +660,9 @@ export const setStateOptions = state => {
   state.styleModule =
     typeof state.opts.styleModule === 'string'
       ? state.opts.styleModule
-      : 'styled-jsx/style'
+      : 'styled-jsx-container/style'
 }
 
 export function log(message) {
-  console.log('[styled-jsx] ' + message)
+  console.log('[styled-jsx-container] ' + message)
 }

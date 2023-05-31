@@ -1,6 +1,6 @@
-// Definitions by: @types/styled-jsx <https://www.npmjs.com/package/@types/styled-jsx>
+// Definitions by: @types/styled-jsx-container <https://www.npmjs.com/package/@types/styled-jsx-container>
 
-declare module 'styled-jsx/css' {
+declare module 'styled-jsx-container/css' {
   function css(chunks: TemplateStringsArray, ...args: any[]): JSX.Element
   namespace css {
     export function global(

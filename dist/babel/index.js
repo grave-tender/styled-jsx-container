@@ -4128,6 +4128,40 @@ var builder$1 = {};
 
 var definitions = {};
 
+function _type_of$4(obj) {
+    "@swc/helpers - typeof";
+    return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
+}
+var toFastProperties;
+var hasRequiredToFastProperties;
+function requireToFastProperties() {
+    if (hasRequiredToFastProperties) return toFastProperties;
+    hasRequiredToFastProperties = 1;
+    var fastProto = null;
+    // Creates an object with permanently fast properties in V8. See Toon Verwaest's
+    // post https://medium.com/@tverwaes/setting-up-prototypes-in-v8-ec9c9491dfe2#5f62
+    // for more details. Use %HasFastProperties(object) and the Node.js flag
+    // --allow-natives-syntax to check whether an object has fast properties.
+    function FastObject(o) {
+        // A prototype object will have "fast properties" enabled once it is checked
+        // against the inline property cache of a function, e.g. fastProto.property:
+        // https://github.com/v8/v8/blob/6.0.122/test/mjsunit/fast-prototype.js#L48-L63
+        if (fastProto !== null && _type_of$4(fastProto.property)) {
+            var result = fastProto;
+            fastProto = FastObject.prototype = null;
+            return result;
+        }
+        fastProto = FastObject.prototype = o == null ? Object.create(null) : o;
+        return new FastObject;
+    }
+    // Initialize the inline property cache of FastObject
+    FastObject();
+    toFastProperties = function toFastproperties(o) {
+        return FastObject(o);
+    };
+    return toFastProperties;
+}
+
 var core = {};
 
 var is = {};
@@ -10478,6 +10512,7 @@ function requireDefinitions() {
             }
         });
         exports.TYPES = void 0;
+        var _toFastProperties = requireToFastProperties();
         requireCore();
         requireFlow();
         requireJsx();
@@ -10486,6 +10521,14 @@ function requireDefinitions() {
         requireTypescript();
         var _utils = requireUtils();
         var _placeholders = requirePlaceholders();
+        _toFastProperties(_utils.VISITOR_KEYS);
+        _toFastProperties(_utils.ALIAS_KEYS);
+        _toFastProperties(_utils.FLIPPED_ALIAS_KEYS);
+        _toFastProperties(_utils.NODE_FIELDS);
+        _toFastProperties(_utils.BUILDER_KEYS);
+        _toFastProperties(_utils.DEPRECATED_KEYS);
+        _toFastProperties(_placeholders.PLACEHOLDERS_ALIAS);
+        _toFastProperties(_placeholders.PLACEHOLDERS_FLIPPED_ALIAS);
         var TYPES = Object.keys(_utils.VISITOR_KEYS).concat(Object.keys(_utils.FLIPPED_ALIAS_KEYS)).concat(Object.keys(_utils.DEPRECATED_KEYS));
         exports.TYPES = TYPES;
     })(definitions);
@@ -21732,7 +21775,7 @@ function disableNestingPlugin() {
         // eslint-disable-next-line no-control-regex
         parent = (parent[0] || "").replace(/\u0000/g, "").trim();
         if (parent.length > 0 && parent.charAt(0) !== "@") {
-            throw new Error("Nesting detected at " + line + ":" + column + ". " + "Unfortunately nesting is not supported by styled-jsx.");
+            throw new Error("Nesting detected at " + line + ":" + column + ". " + "Unfortunately nesting is not supported by styled-jsx-container.");
         }
     }
 }
@@ -22166,7 +22209,7 @@ var combinePlugins = function(plugins) {
             options = plugin[1] || {};
             plugin = plugin[0];
             if (Object.prototype.hasOwnProperty.call(options, "babel")) {
-                throw new Error("\n            Error while trying to register the styled-jsx plugin: " + plugin + "\n            The option name `babel` is reserved.\n          ");
+                throw new Error("\n            Error while trying to register the styled-jsx-container plugin: " + plugin + "\n            The option name `babel` is reserved.\n          ");
             }
         }
         log("Loading plugin from path: " + plugin);
@@ -22197,10 +22240,6 @@ var getPrefix = function(isDynamic, id) {
 };
 var processCss = function(stylesInfo, options) {
     var hash = stylesInfo.hash, css = stylesInfo.css, expressions = stylesInfo.expressions, dynamic = stylesInfo.dynamic, location = stylesInfo.location, file = stylesInfo.file, isGlobal = stylesInfo.isGlobal, plugins = stylesInfo.plugins, vendorPrefixes = stylesInfo.vendorPrefixes, sourceMaps = stylesInfo.sourceMaps;
-    console.log("@@@");
-    console.log(plugins);
-    console.log("###");
-    console.log(stylesInfo);
     var fileInfo = {
         code: file.code,
         sourceRoot: file.opts.sourceRoot,
@@ -22291,10 +22330,10 @@ var setStateOptions = function(state) {
     if (!state.plugins) {
         state.plugins = combinePlugins(state.opts.plugins);
     }
-    state.styleModule = typeof state.opts.styleModule === "string" ? state.opts.styleModule : "styled-jsx/style";
+    state.styleModule = typeof state.opts.styleModule === "string" ? state.opts.styleModule : "styled-jsx-container/style";
 };
 function log(message) {
-    console.log("[styled-jsx] " + message);
+    console.log("[styled-jsx-container] " + message);
 }
 
 function _extends$1() {
@@ -22382,12 +22421,12 @@ function addHash(exportIdentifier, hash) {
 }
 var visitor = {
     ImportDeclaration: function ImportDeclaration(path, state) {
-        // import css from 'styled-jsx/css'
-        if (path.node.source.value !== "styled-jsx/css") {
+        // import css from 'styled-jsx-container/css'
+        if (path.node.source.value !== "styled-jsx-container/css") {
             return;
         }
         // Find all the imported specifiers.
-        // e.g import css, { global, resolve } from 'styled-jsx/css'
+        // e.g import css, { global, resolve } from 'styled-jsx-container/css'
         // -> ['css', 'global', 'resolve']
         var specifiersNames = path.node.specifiers.map(function(specifier) {
             return specifier.local.name;
@@ -22451,7 +22490,7 @@ var visitor = {
             });
             var hasCssResolve = hasJSXStyle && taggedTemplateExpressions.resolve.length > 0;
             // When using the `resolve` helper we need to add an import
-            // for the _JSXStyle component `styled-jsx/style`
+            // for the _JSXStyle component `styled-jsx-container/style`
             if (hasCssResolve) {
                 state.file.hasCssResolve = true;
             }
@@ -22468,8 +22507,8 @@ function babelMacro(param) {
         setStateOptions(state);
         // Holds a reference to all the lines where strings are tagged using the `css` tag name.
         // We print a warning at the end of the macro in case there is any reference to css,
-        // because `css` is generally used as default import name for 'styled-jsx/css'.
-        // People who want to migrate from this macro to pure styled-jsx might have name conflicts issues.
+        // because `css` is generally used as default import name for 'styled-jsx-container/css'.
+        // People who want to migrate from this macro to pure styled-jsx-container might have name conflicts issues.
         var cssReferences = [];
         // references looks like this
         // {
@@ -22478,7 +22517,7 @@ function babelMacro(param) {
         // }
         Object.keys(references).forEach(function(refName) {
             // Enforce `resolve` as named import so people
-            // can only import { resolve } from 'styled-jsx/macro'
+            // can only import { resolve } from 'styled-jsx-container/macro'
             // or an alias of it eg. { resolve as foo }
             if (refName !== "default" && refName !== "resolve") {
                 throw new MacroError("Imported an invalid named import: " + refName + ". Please import: resolve");
@@ -22496,7 +22535,7 @@ function babelMacro(param) {
                     // grab .resolve
                     var tagPropertyName = templateExpression.get("property").node.name;
                     // Member expressions are only valid on default imports
-                    // eg. import css from 'styled-jsx/macro'
+                    // eg. import css from 'styled-jsx-container/macro'
                     if (refName !== "default") {
                         throw new MacroError("Can't use named import " + path.node.name + " as a member expression: " + path.node.name + "." + tagPropertyName + "`div { color: red }` Please use it directly: " + path.node.name + "`div { color: red }`");
                     }
@@ -22539,7 +22578,7 @@ function babelMacro(param) {
             });
         });
         if (cssReferences.length > 0) {
-            console.warn("styled-jsx - Warning - We detected that you named your tag as `css` at lines: " + cssReferences.join(", ") + ".\n" + "This tag name is usually used as default import name for `styled-jsx/css`.\n" + "Porting macro code to pure styled-jsx in the future might be a bit problematic.");
+            console.warn("styled-jsx-container - Warning - We detected that you named your tag as `css` at lines: " + cssReferences.join(", ") + ".\n" + "This tag name is usually used as default import name for `styled-jsx-container/css`.\n" + "Porting macro code to pure styled-jsx-container in the future might be a bit problematic.");
         }
     };
     return createMacro(styledJsxMacro);
@@ -22761,7 +22800,7 @@ function babel(param) {
                     try {
                         styleTagSrc = path.getSource();
                     } catch (error) {}
-                    throw path.buildCodeFrameError("Detected nested style tag" + (styleTagSrc ? ": \n\n" + styleTagSrc + "\n\n" : " ") + "styled-jsx only allows style tags " + "to be direct descendants (children) of the outermost " + "JSX element i.e. the subtree root.");
+                    throw path.buildCodeFrameError("Detected nested style tag" + (styleTagSrc ? ": \n\n" + styleTagSrc + "\n\n" : " ") + "styled-jsx-container only allows style tags " + "to be direct descendants (children) of the outermost " + "JSX element i.e. the subtree root.");
                 }
                 if (state.externalStyles.length > 0 && path.get("children").filter(function(child) {
                     if (!t.isJSXExpressionContainer(child)) {
