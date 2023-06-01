@@ -5432,8 +5432,7 @@ function webpack(content) {
         return this.callback("The given `type` option is invalid. \n\n" + "Expected:\n One of scoped|global|resolve \n\n" + "Actual:\n " + options.type);
     }
     // Allows to define the type for each individual file using a CSS comment.
-    var commentType = content.match(/\/*\s*@styled-jsx=(scoped|global|resolve)/) //@
-    ;
+    var commentType = content.match(/\/*\s*@styled-jsx-container=(scoped|global|resolve)/);
     if (commentType) {
         options.type = commentType[1];
     }
