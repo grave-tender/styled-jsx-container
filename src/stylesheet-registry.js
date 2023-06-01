@@ -23,7 +23,7 @@ export class StyleSheetRegistry {
     this._sheet =
       styleSheet ||
       new DefaultStyleSheet({
-        name: 'styled-jsx-container',
+        name: 'styled-jsx-container', //#
         optimizeForSpeed
       })
 

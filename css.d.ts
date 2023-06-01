@@ -1,4 +1,4 @@
-// Definitions by: @types/styled-jsx-container <https://www.npmjs.com/package/@types/styled-jsx-container>
+// Definitions by: @types/styled-jsx <https://www.npmjs.com/package/@types/styled-jsx>
 
 declare module 'styled-jsx-container/css' {
   function css(chunks: TemplateStringsArray, ...args: any[]): JSX.Element

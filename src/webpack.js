@@ -28,7 +28,7 @@ export default function(content) {
   }
 
   // Allows to define the type for each individual file using a CSS comment.
-  const commentType = content.match(/\/*\s*@styled-jsx-container=(scoped|global|resolve)/)
+  const commentType = content.match(/\/*\s*@styled-jsx=(scoped|global|resolve)/) //@
   if (commentType) {
     options.type = commentType[1]
   }

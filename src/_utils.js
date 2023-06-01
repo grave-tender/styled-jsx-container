@@ -657,10 +657,11 @@ export const setStateOptions = state => {
       vendorPrefixes: state.opts.vendorPrefixes
     })
   }
-  state.styleModule =
-    typeof state.opts.styleModule === 'string'
-      ? state.opts.styleModule
-      : 'styled-jsx-container/style'
+  // state.styleModule =
+  //   typeof state.opts.styleModule === 'string'
+  //     ? state.opts.styleModule
+  //     : 'styled-jsx-container/style'
+  state.styleModule = 'styled-jsx-container/style'; //@
 }
 
 export function log(message) {
