@@ -4128,40 +4128,6 @@ var builder$1 = {};
 
 var definitions = {};
 
-function _type_of$4(obj) {
-    "@swc/helpers - typeof";
-    return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
-}
-var toFastProperties;
-var hasRequiredToFastProperties;
-function requireToFastProperties() {
-    if (hasRequiredToFastProperties) return toFastProperties;
-    hasRequiredToFastProperties = 1;
-    var fastProto = null;
-    // Creates an object with permanently fast properties in V8. See Toon Verwaest's
-    // post https://medium.com/@tverwaes/setting-up-prototypes-in-v8-ec9c9491dfe2#5f62
-    // for more details. Use %HasFastProperties(object) and the Node.js flag
-    // --allow-natives-syntax to check whether an object has fast properties.
-    function FastObject(o) {
-        // A prototype object will have "fast properties" enabled once it is checked
-        // against the inline property cache of a function, e.g. fastProto.property:
-        // https://github.com/v8/v8/blob/6.0.122/test/mjsunit/fast-prototype.js#L48-L63
-        if (fastProto !== null && _type_of$4(fastProto.property)) {
-            var result = fastProto;
-            fastProto = FastObject.prototype = null;
-            return result;
-        }
-        fastProto = FastObject.prototype = o == null ? Object.create(null) : o;
-        return new FastObject;
-    }
-    // Initialize the inline property cache of FastObject
-    FastObject();
-    toFastProperties = function toFastproperties(o) {
-        return FastObject(o);
-    };
-    return toFastProperties;
-}
-
 var core = {};
 
 var is = {};
@@ -10512,7 +10478,6 @@ function requireDefinitions() {
             }
         });
         exports.TYPES = void 0;
-        var _toFastProperties = requireToFastProperties();
         requireCore();
         requireFlow();
         requireJsx();
@@ -10521,14 +10486,6 @@ function requireDefinitions() {
         requireTypescript();
         var _utils = requireUtils();
         var _placeholders = requirePlaceholders();
-        _toFastProperties(_utils.VISITOR_KEYS);
-        _toFastProperties(_utils.ALIAS_KEYS);
-        _toFastProperties(_utils.FLIPPED_ALIAS_KEYS);
-        _toFastProperties(_utils.NODE_FIELDS);
-        _toFastProperties(_utils.BUILDER_KEYS);
-        _toFastProperties(_utils.DEPRECATED_KEYS);
-        _toFastProperties(_placeholders.PLACEHOLDERS_ALIAS);
-        _toFastProperties(_placeholders.PLACEHOLDERS_FLIPPED_ALIAS);
         var TYPES = Object.keys(_utils.VISITOR_KEYS).concat(Object.keys(_utils.FLIPPED_ALIAS_KEYS)).concat(Object.keys(_utils.DEPRECATED_KEYS));
         exports.TYPES = TYPES;
     })(definitions);
@@ -22239,6 +22196,8 @@ var getPrefix = function(isDynamic, id) {
     return isDynamic ? ".__jsx-style-dynamic-selector" : "." + id;
 };
 var processCss = function(stylesInfo, options) {
+    console.log("@@");
+    console.log(stylesInfo, options);
     var hash = stylesInfo.hash, css = stylesInfo.css, expressions = stylesInfo.expressions, dynamic = stylesInfo.dynamic, location = stylesInfo.location, file = stylesInfo.file, isGlobal = stylesInfo.isGlobal, plugins = stylesInfo.plugins, vendorPrefixes = stylesInfo.vendorPrefixes, sourceMaps = stylesInfo.sourceMaps;
     var fileInfo = {
         code: file.code,
@@ -22354,6 +22313,17 @@ function _extends$1() {
     };
     return _extends$1.apply(this, arguments);
 }
+console.log("@@");
+console.log({
+    getJSXStyleInfo: getJSXStyleInfo,
+    processCss: processCss,
+    cssToBabelType: cssToBabelType,
+    validateExternalExpressions: validateExternalExpressions,
+    getScope: getScope,
+    computeClassNames: computeClassNames,
+    makeStyledJsxTag: makeStyledJsxTag,
+    setStateOptions: setStateOptions
+});
 var isModuleExports = lib$1.buildMatchMemberExpression("module.exports");
 function processTaggedTemplateExpression(param) {
     var type = param.type, path = param.path, file = param.file, splitRules = param.splitRules, plugins = param.plugins, vendorPrefixes = param.vendorPrefixes, sourceMaps = param.sourceMaps, styleComponentImportName = param.styleComponentImportName;

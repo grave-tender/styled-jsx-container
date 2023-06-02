@@ -11,6 +11,18 @@ import {
   setStateOptions
 } from './_utils'
 
+console.log('@@');
+console.log({
+  getJSXStyleInfo,
+  processCss,
+  cssToBabelType,
+  validateExternalExpressions,
+  getScope,
+  computeClassNames,
+  makeStyledJsxTag,
+  setStateOptions
+});
+
 const isModuleExports = t.buildMatchMemberExpression('module.exports')
 
 export function processTaggedTemplateExpression({

@@ -2,6 +2,8 @@
 
 declare module 'styled-jsx-container/css' {
   function css(chunks: TemplateStringsArray, ...args: any[]): JSX.Element
+  //@@
+  console.log(chunks, args);
   namespace css {
     export function global(
       chunks: TemplateStringsArray,

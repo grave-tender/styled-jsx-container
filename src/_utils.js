@@ -518,6 +518,8 @@ const getPrefix = (isDynamic, id) =>
   isDynamic ? '.__jsx-style-dynamic-selector' : `.${id}`
 
 export const processCss = (stylesInfo, options) => {
+  console.log('@@');
+  console.log(stylesInfo, options);
   const {
     hash,
     css,
